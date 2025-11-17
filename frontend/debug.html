@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Info</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .section {
+      background: white;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+    h2 {
+      margin-top: 0;
+      color: #667eea;
+    }
+    pre {
+      background: #f0f0f0;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 12px;
+    }
+    .success { color: green; font-weight: bold; }
+    .error { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>🔍 Debug Information</h1>
+  
+  <div class="section">
+    <h2>localStorage Status</h2>
+    <div id="localStorageInfo"></div>
+  </div>
+
+  <div class="section">
+    <h2>sessionStorage Status</h2>
+    <div id="sessionStorageInfo"></div>
+  </div>
+
+  <div class="section">
+    <h2>Auth Keys Found</h2>
+    <div id="authKeysInfo"></div>
+  </div>
+
+  <button onclick="location.reload()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px;">
+    🔄 Refresh
+  </button>
+
+  <button onclick="window.location.href='dashboard.html'" style="padding: 10px 20px; background: #48bb78; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-left: 10px;">
+    📊 Go to Dashboard
+  </button>
+
+  <script>
+    // Check localStorage
+    const localStorageDiv = document.getElementById('localStorageInfo');
+    const allLocalKeys = Object.keys(localStorage);
+    const authKeys = allLocalKeys.filter(key => key.startsWith('auth_'));
+    
+    if (allLocalKeys.length === 0) {
+      localStorageDiv.innerHTML = '<p class="error">❌ localStorage is EMPTY</p>';
+    } else {
+      localStorageDiv.innerHTML = `
+        <p class="success">✅ localStorage has ${allLocalKeys.length} items</p>
+        <pre>${JSON.stringify(localStorage, null, 2)}</pre>
+      `;
+    }
+
+    // Check sessionStorage
+    const sessionStorageDiv = document.getElementById('sessionStorageInfo');
+    const sessionEmployee = sessionStorage.getItem('employee');
+    
+    if (sessionEmployee) {
+      sessionStorageDiv.innerHTML = `
+        <p class="success">✅ Employee found in sessionStorage</p>
+        <pre>${JSON.stringify(JSON.parse(sessionEmployee), null, 2)}</pre>
+      `;
+    } else {
+      sessionStorageDiv.innerHTML = '<p class="error">❌ No employee in sessionStorage</p>';
+    }
+
+    // Check auth keys
+    const authKeysDiv = document.getElementById('authKeysInfo');
+    
+    if (authKeys.length === 0) {
+      authKeysDiv.innerHTML = '<p class="error">❌ No auth keys found (auth_*)</p>';
+    } else {
+      let html = `<p class="success">✅ Found ${authKeys.length} auth key(s):</p>`;
+      authKeys.forEach(key => {
+        const data = JSON.parse(localStorage.getItem(key));
+        html += `<pre><strong>${key}</strong>\n${JSON.stringify(data, null, 2)}</pre>`;
+      });
+      authKeysDiv.innerHTML = html;
+    }
+  </script>
+</body>
+</html>

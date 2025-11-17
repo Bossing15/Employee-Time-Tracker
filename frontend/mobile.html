@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>My Attendance</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 10px;
+      padding-bottom: 20px;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding-bottom: 20px;
+    }
+
+    .header {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    .employee-name {
+      font-size: 1.5em;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .employee-id {
+      color: #999;
+      font-size: 0.9em;
+    }
+
+    .status-card {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: 600;
+      font-size: 1.1em;
+      margin-bottom: 15px;
+    }
+
+    .status-active {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-inactive {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .clock-time {
+      font-size: 2em;
+      color: #667eea;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.2em;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: all 0.3s;
+    }
+
+    .btn-clock-in {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-clock-out {
+      background: #f56565;
+      color: white;
+    }
+
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+
+    .card-title {
+      font-size: 1.3em;
+      color: #333;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .summary-item {
+      background: #f7fafc;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .summary-value {
+      font-size: 2em;
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .summary-label {
+      color: #666;
+      font-size: 0.9em;
+      margin-top: 5px;
+    }
+
+    .attendance-item {
+      padding: 15px;
+      border-left: 4px solid #667eea;
+      background: #f7fafc;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+
+    .attendance-date {
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+
+    .attendance-time {
+      color: #555;
+      font-size: 0.95em;
+      margin-bottom: 5px;
+    }
+
+    .attendance-hours {
+      color: #48bb78;
+      font-weight: 600;
+      font-size: 1.1em;
+    }
+
+    .no-data {
+      text-align: center;
+      color: #999;
+      padding: 30px;
+    }
+
+    .notes-section {
+      margin-top: 15px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: inherit;
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .current-time {
+      font-size: 0.9em;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: white;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="loading" class="loading">Loading...</div>
+    
+    <div id="content" style="display: none;">
+      <div class="header">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div class="employee-name" id="employeeName">-</div>
+            <div class="employee-id" id="employeeId">-</div>
+          </div>
+          <button onclick="logout()" style="padding: 8px 16px; background: #f56565; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Logout</button>
+        </div>
+      </div>
+
+      <div class="status-card">
+        <div id="statusBadge" class="status-badge">-</div>
+        <div class="clock-time" id="currentTime">--:--:--</div>
+        <div class="current-time" id="currentDate">-</div>
+        
+        <div id="clockInTime" style="display: none; margin-top: 15px;">
+          <div style="color: #666; font-size: 0.9em;">Clocked in at</div>
+          <div style="font-size: 1.2em; color: #333; font-weight: 600;" id="clockInDisplay">-</div>
+        </div>
+
+        <div style="background: #e6f2ff; padding: 20px; border-radius: 12px; margin-top: 15px;">
+          <p style="color: #667eea; font-weight: 600; margin-bottom: 10px;">📱 How to Clock In/Out:</p>
+          <p style="color: #555; font-size: 0.9em; line-height: 1.6;">
+            1. Use your QR scanner app<br>
+            2. Scan the attendance QR code at entrance<br>
+            3. Enter your Employee ID<br>
+            4. Done! Automatically clocks you in or out
+          </p>
+        </div>
+        
+        <div id="notesSection" class="notes-section" style="display: none;">
+          <textarea id="notes" placeholder="Add notes about your shift (optional)"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">This Week</div>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <div class="summary-value" id="weekDays">0</div>
+            <div class="summary-label">Days</div>
+          </div>
+          <div class="summary-item">
+            <div class="summary-value" id="weekHours">0</div>
+            <div class="summary-label">Hours</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Recent Attendance</div>
+        <div id="recentAttendance"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const employeeId = urlParams.get('id');
+    const API_URL = window.location.origin + '/api';
+
+    if (!employeeId) {
+      document.getElementById('loading').innerHTML = 'Invalid QR Code<br><small>Employee ID not found</small>';
+    } else {
+      // Check if employee is authenticated for this device
+      const authKey = 'auth_' + employeeId;
+      const isAuthenticated = localStorage.getItem(authKey);
+      
+      if (!isAuthenticated) {
+        // Redirect to mobile login with employee ID
+        window.location.href = `mobile-login.html?id=${employeeId}`;
+      } else {
+        loadEmployeeData();
+        updateClock();
+        setInterval(updateClock, 1000);
+        setInterval(loadStatus, 30000); // Refresh status every 30 seconds
+      }
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('currentTime').textContent = now.toLocaleTimeString();
+      document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', { 
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+      });
+    }
+
+    async function loadEmployeeData() {
+      try {
+        const response = await fetch(`${API_URL}/employees`);
+        const employees = await response.json();
+        const employee = employees.find(e => e.employee_id === employeeId);
+        
+        if (employee) {
+          document.getElementById('employeeName').textContent = employee.name;
+          document.getElementById('employeeId').textContent = `ID: ${employee.employee_id}`;
+        }
+
+        await loadStatus();
+        await loadWeeklySummary();
+        await loadRecentAttendance();
+        
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+      } catch (error) {
+        document.getElementById('loading').innerHTML = 'Error loading data<br><small>' + error.message + '</small>';
+      }
+    }
+
+    async function loadStatus() {
+      try {
+        const response = await fetch(`${API_URL}/status/${employeeId}`);
+        const data = await response.json();
+        
+        const statusBadge = document.getElementById('statusBadge');
+        const clockInBtn = document.getElementById('clockInBtn');
+        const clockOutBtn = document.getElementById('clockOutBtn');
+        const notesSection = document.getElementById('notesSection');
+        const clockInTime = document.getElementById('clockInTime');
+        
+        if (data.clocked_in) {
+          statusBadge.textContent = '✓ Clocked In';
+          statusBadge.className = 'status-badge status-active';
+          clockInBtn.style.display = 'none';
+          clockOutBtn.style.display = 'block';
+          notesSection.style.display = 'block';
+          clockInTime.style.display = 'block';
+          document.getElementById('clockInDisplay').textContent = new Date(data.record.clock_in).toLocaleTimeString();
+        } else {
+          statusBadge.textContent = 'Not Clocked In';
+          statusBadge.className = 'status-badge status-inactive';
+          clockInBtn.style.display = 'block';
+          clockOutBtn.style.display = 'none';
+          notesSection.style.display = 'none';
+          clockInTime.style.display = 'none';
+        }
+      } catch (error) {
+        console.error('Error loading status:', error);
+      }
+    }
+
+    async function loadWeeklySummary() {
+      try {
+        const today = new Date();
+        const weekAgo = new Date(today);
+        weekAgo.setDate(today.getDate() - 7);
+        
+        const startDate = weekAgo.toISOString().split('T')[0];
+        const endDate = today.toISOString().split('T')[0];
+        
+        const response = await fetch(`${API_URL}/attendance?employee_id=${employeeId}&start_date=${startDate}&end_date=${endDate}`);
+        const records = await response.json();
+        
+        const completedRecords = records.filter(r => r.clock_out);
+        const totalHours = completedRecords.reduce((sum, r) => sum + (r.hours_worked || 0), 0);
+        
+        document.getElementById('weekDays').textContent = completedRecords.length;
+        document.getElementById('weekHours').textContent = totalHours.toFixed(1);
+      } catch (error) {
+        console.error('Error loading weekly summary:', error);
+      }
+    }
+
+    async function loadRecentAttendance() {
+      try {
+        const response = await fetch(`${API_URL}/attendance?employee_id=${employeeId}`);
+        const records = await response.json();
+        
+        const container = document.getElementById('recentAttendance');
+        
+        if (records.length === 0) {
+          container.innerHTML = '<div class="no-data">No attendance records yet</div>';
+          return;
+        }
+        
+        const html = records.slice(0, 10).map(record => `
+          <div class="attendance-item">
+            <div class="attendance-date">${new Date(record.clock_in).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+            <div class="attendance-time">
+              In: ${new Date(record.clock_in).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              ${record.clock_out ? `| Out: ${new Date(record.clock_out).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '| <strong>Still clocked in</strong>'}
+            </div>
+            ${record.hours_worked ? `<div class="attendance-hours">${record.hours_worked} hours</div>` : ''}
+            ${record.notes ? `<div style="color: #666; font-size: 0.9em; margin-top: 5px; font-style: italic;">${record.notes}</div>` : ''}
+          </div>
+        `).join('');
+        
+        container.innerHTML = html;
+      } catch (error) {
+        console.error('Error loading attendance:', error);
+      }
+    }
+
+    async function clockIn() {
+      try {
+        const response = await fetch(`${API_URL}/clock-in`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ employee_id: employeeId })
+        });
+        
+        if (response.ok) {
+          await loadStatus();
+          await loadWeeklySummary();
+          await loadRecentAttendance();
+        } else {
+          const error = await response.json();
+          alert(error.error);
+        }
+      } catch (error) {
+        alert('Error clocking in: ' + error.message);
+      }
+    }
+
+    async function clockOut() {
+      const notes = document.getElementById('notes').value.trim();
+      
+      try {
+        const response = await fetch(`${API_URL}/clock-out`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ employee_id: employeeId, notes })
+        });
+        
+        if (response.ok) {
+          document.getElementById('notes').value = '';
+          await loadStatus();
+          await loadWeeklySummary();
+          await loadRecentAttendance();
+        } else {
+          const error = await response.json();
+          alert(error.error);
+        }
+      } catch (error) {
+        alert('Error clocking out: ' + error.message);
+      }
+    }
+
+    function logout() {
+      if (confirm('Are you sure you want to logout? You will need to login again to use this QR code.')) {
+        const authKey = 'auth_' + employeeId;
+        localStorage.removeItem(authKey);
+        window.location.href = `mobile-login.html?id=${employeeId}`;
+      }
+    }
+
+    function openScanner() {
+      window.location.href = `scanner.html?id=${employeeId}`;
+    }
+
+    document.getElementById('scanBtn').addEventListener('click', openScanner);
+
+  </script>
+</body>
+</html>

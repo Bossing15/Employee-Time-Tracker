@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Check</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px 30px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .icon {
+      font-size: 5em;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 1.8em;
+    }
+
+    .message {
+      color: #666;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+
+    .employee-info {
+      background: #f7fafc;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .employee-info h3 {
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+
+    .employee-info p {
+      color: #666;
+      font-size: 0.9em;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.2em;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .btn-clock-in {
+      background: #48bb78;
+      color: white;
+    }
+
+    .btn-clock-out {
+      background: #f56565;
+      color: white;
+    }
+
+    .btn-cancel {
+      background: #e0e0e0;
+      color: #666;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .loading {
+      color: #666;
+      padding: 40px;
+    }
+
+    .result {
+      display: none;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      font-size: 1.1em;
+      font-weight: 600;
+    }
+
+    .result.success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .result.error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    #loginPrompt {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Loading State -->
+    <div id="loading" class="loading">
+      <div class="icon">⏳</div>
+      <h1>Checking...</h1>
+      <p>Please wait</p>
+    </div>
+
+    <!-- Login Prompt (if not logged in) -->
+    <div id="loginPrompt">
+      <div class="icon">🔐</div>
+      <h1>Login Required</h1>
+      <p class="message">Please login to clock in/out</p>
+      <button class="btn btn-clock-in" onclick="goToLogin()">Login Now</button>
+      <button class="btn btn-cancel" onclick="window.close()">Cancel</button>
+    </div>
+
+
+  </div>
+
+  <script>
+    const API_URL = window.location.origin + '/api';
+    let currentEmployee = null;
+    let currentAction = null;
+
+    // Check login status on page load
+    window.onload = function() {
+      checkLoginStatus();
+    };
+
+    function checkLoginStatus() {
+      // Check localStorage first (persistent login)
+      const authKeys = Object.keys(localStorage).filter(key => key.startsWith('auth_'));
+      
+      // Also check sessionStorage as fallback
+      const sessionEmployee = sessionStorage.getItem('employee');
+      
+      console.log('=== LOGIN CHECK DEBUG ===');
+      console.log('All localStorage keys:', Object.keys(localStorage));
+      console.log('Auth keys found:', authKeys);
+      console.log('Session employee:', sessionEmployee);
+      console.log('Full localStorage:', localStorage);
+      
+      if (authKeys.length > 0) {
+        // Found in localStorage
+        const authData = JSON.parse(localStorage.getItem(authKeys[0]));
+        console.log('Found logged in employee in localStorage:', authData);
+        currentEmployee = authData;
+        checkAttendanceStatus();
+      } else if (sessionEmployee) {
+        // Found in sessionStorage, migrate to localStorage
+        const employee = JSON.parse(sessionEmployee);
+        console.log('Found logged in employee in sessionStorage:', employee);
+        
+        // Save to localStorage for future scans
+        localStorage.setItem('auth_' + employee.employee_id, JSON.stringify({
+          employee_id: employee.employee_id,
+          name: employee.name,
+          username: employee.username,
+          authenticated_at: new Date().toISOString()
+        }));
+        
+        currentEmployee = {
+          employee_id: employee.employee_id,
+          name: employee.name,
+          username: employee.username
+        };
+        checkAttendanceStatus();
+      } else {
+        // No login found
+        console.log('No login found, showing login prompt');
+        showLoginPrompt();
+      }
+    }
+
+    async function checkAttendanceStatus() {
+      try {
+        const response = await fetch(`${API_URL}/status/${currentEmployee.employee_id}`);
+        const data = await response.json();
+        
+        if (data.clocked_in) {
+          // Already clocked in, automatically clock out
+          currentAction = 'out';
+          await performAction();
+        } else {
+          // Not clocked in, automatically clock in
+          currentAction = 'in';
+          await performAction();
+        }
+      } catch (error) {
+        showError('Error checking status: ' + error.message);
+      }
+    }
+
+    function showLoginPrompt() {
+      // Show debug info before redirecting
+      document.getElementById('loading').innerHTML = `
+        <div class="icon">🔐</div>
+        <h1>Login Required</h1>
+        <p style="color: #ccc; margin: 20px 0;">No login found in this browser</p>
+        <p style="color: #999; font-size: 0.9em;">localStorage keys: ${Object.keys(localStorage).length}</p>
+        <p style="color: #999; font-size: 0.9em;">auth keys: ${Object.keys(localStorage).filter(k => k.startsWith('auth_')).length}</p>
+        <button class="btn btn-clock-in" onclick="window.location.href='login.html?redirect=attendance-scan'" style="margin-top: 20px;">
+          Login Now
+        </button>
+        <button class="btn btn-cancel" onclick="window.location.href='debug.html'" style="margin-top: 10px;">
+          View Debug Info
+        </button>
+      `;
+    }
+
+    async function performAction() {
+      const endpoint = currentAction === 'in' ? 'clock-in' : 'clock-out';
+      
+      // Show processing message
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('loading').innerHTML = `
+        <div class="icon">${currentAction === 'in' ? '⏰' : '👋'}</div>
+        <h1>${currentAction === 'in' ? 'Clocking In...' : 'Clocking Out...'}</h1>
+        <p>Please wait</p>
+      `;
+      
+      try {
+        const response = await fetch(`${API_URL}/${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ employee_id: currentEmployee.employee_id })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          const icon = currentAction === 'in' ? '✅' : '👋';
+          const message = currentAction === 'in' ? 'Clocked In Successfully!' : 'Clocked Out Successfully!';
+          
+          // Show success message
+          document.getElementById('loading').innerHTML = `
+            <div class="icon">${icon}</div>
+            <h1>${message}</h1>
+            <p style="color: #48bb78; font-weight: 600;">${currentEmployee.name}</p>
+            <p style="color: #ccc;">Redirecting to dashboard...</p>
+          `;
+          
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 2000);
+        } else {
+          document.getElementById('loading').innerHTML = `
+            <div class="icon">❌</div>
+            <h1>Error</h1>
+            <p style="color: #f56565;">${data.error || 'Failed to process'}</p>
+            <button class="btn btn-cancel" onclick="window.location.reload()" style="margin-top: 20px;">Try Again</button>
+          `;
+        }
+      } catch (error) {
+        document.getElementById('loading').innerHTML = `
+          <div class="icon">❌</div>
+          <h1>Error</h1>
+          <p style="color: #f56565;">${error.message}</p>
+          <button class="btn btn-cancel" onclick="window.location.reload()" style="margin-top: 20px;">Try Again</button>
+        `;
+      }
+    }
+
+
+  </script>
+</body>
+</html>

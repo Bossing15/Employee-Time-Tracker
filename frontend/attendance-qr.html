@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance QR Code</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .qr-display {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .qr-display h2 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .qr-code-large {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      display: inline-block;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      margin: 20px 0;
+    }
+
+    .qr-code-large img {
+      width: 400px;
+      height: 400px;
+      display: block;
+    }
+
+    .instructions-box {
+      background: #e6f2ff;
+      border-left: 4px solid #667eea;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 30px auto;
+      max-width: 600px;
+      text-align: left;
+    }
+
+    .instructions-box h3 {
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+
+    .instructions-box ol {
+      margin-left: 20px;
+      color: #555;
+    }
+
+    .instructions-box li {
+      margin-bottom: 10px;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+      
+      .card, .admin-link {
+        display: none;
+      }
+      
+      .qr-display {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Attendance Check-In QR Code</h1>
+    
+    <div class="card">
+      <div class="qr-display">
+        <h2>📱 Scan to Clock In/Out</h2>
+        <p style="color: #666; margin-bottom: 20px;">Display this QR code at your workplace entrance</p>
+        
+        <div class="qr-code-large" id="qrCodeDisplay">
+          <p style="color: #999;">Loading...</p>
+        </div>
+
+        <div class="instructions-box">
+          <h3>📋 How Employees Use This:</h3>
+          <ol>
+            <li>Employee logs into their account on their phone</li>
+            <li>Opens their attendance page</li>
+            <li>Taps "📷 Scan QR Code to Clock In/Out"</li>
+            <li>Points camera at this QR code</li>
+            <li>System automatically clocks them in or out</li>
+          </ol>
+        </div>
+
+        <div style="margin-top: 30px;">
+          <button onclick="window.print()" class="btn btn-primary">🖨️ Print QR Code</button>
+          <button onclick="refreshQR()" class="btn btn-secondary">🔄 Refresh QR Code</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-link">
+      <a href="dashboard.html">← Back to Dashboard</a> | 
+      <a href="admin.html">Payroll Reports →</a>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = window.location.origin + '/api';
+
+    async function loadQRCode() {
+      try {
+        const response = await fetch(`${API_URL}/qr-attendance`);
+        const data = await response.json();
+        
+        document.getElementById('qrCodeDisplay').innerHTML = `<img src="${data.qrCode}" alt="Attendance QR Code">`;
+      } catch (error) {
+        document.getElementById('qrCodeDisplay').innerHTML = '<p style="color: #c33;">Error loading QR code</p>';
+      }
+    }
+
+    function refreshQR() {
+      document.getElementById('qrCodeDisplay').innerHTML = '<p style="color: #999;">Loading...</p>';
+      loadQRCode();
+    }
+
+    loadQRCode();
+  </script>
+</body>
+</html>

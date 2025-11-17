@@ -1,0 +1,276 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: white;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2.5em;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.5em;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.form-row .form-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-weight: 500;
+}
+
+input[type="text"],
+input[type="date"],
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.button-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex: 1;
+}
+
+.btn-primary {
+  background: #667eea;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #5568d3;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background: #48bb78;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #38a169;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+}
+
+.btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.status {
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+.status-active {
+  color: #38a169;
+  font-size: 1.1em;
+}
+
+.status-inactive {
+  color: #999;
+}
+
+.status-ok {
+  color: #38a169;
+  font-weight: 600;
+}
+
+.status-warning {
+  color: #ed8936;
+  font-weight: 600;
+}
+
+.activity-item {
+  padding: 15px;
+  border-left: 4px solid #667eea;
+  background: #f7fafc;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.activity-date {
+  font-weight: 600;
+  color: #667eea;
+  margin-bottom: 5px;
+}
+
+.activity-time {
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.activity-hours {
+  color: #38a169;
+  font-weight: 600;
+}
+
+.activity-notes {
+  color: #666;
+  font-style: italic;
+  margin-top: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+thead {
+  background: #667eea;
+  color: white;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+tbody tr:hover {
+  background: #f7fafc;
+}
+
+tbody tr.incomplete {
+  background: #fff5f5;
+}
+
+tfoot {
+  background: #f7fafc;
+  font-weight: 600;
+}
+
+.warning {
+  color: #ed8936;
+  font-weight: 600;
+}
+
+.no-data {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+}
+
+.admin-link {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.admin-link a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1em;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.2);
+  display: inline-block;
+  transition: all 0.3s;
+}
+
+.admin-link a:hover {
+  background: rgba(255,255,255,0.3);
+  transform: translateY(-2px);
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+#notesSection {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px solid #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .button-group {
+    flex-direction: column;
+  }
+  
+  .form-row {
+    flex-direction: column;
+  }
+  
+  table {
+    font-size: 14px;
+  }
+  
+  th, td {
+    padding: 8px;
+  }
+}

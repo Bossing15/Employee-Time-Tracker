@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Time Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 0;
+      margin: 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+    }
+
+    .navbar-brand {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #667eea;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .navbar-brand span:first-child {
+      font-size: 1.4em;
+    }
+
+    .navbar-user {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding-left: 20px;
+      border-left: 2px solid #e0e0e0;
+    }
+
+    .user-badge {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .user-name {
+      font-weight: 600;
+      color: #333;
+      font-size: 0.95em;
+    }
+
+    .user-role {
+      font-size: 0.8em;
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .logout-btn {
+      padding: 8px 16px;
+      background: #f56565;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: #e53e3e;
+      transform: translateY(-1px);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-brand">
+        <span>⏰</span>
+        <span>Time Tracker</span>
+      </div>
+
+      <div class="navbar-user">
+        <div class="user-badge">
+          <div class="user-name" id="navAdminName">-</div>
+          <div class="user-role">Admin</div>
+        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container"></div>
+    
+    <div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+      <h2 style="color: white; margin-bottom: 15px;">📷 Attendance QR Code</h2>
+      <p style="margin-bottom: 20px; opacity: 0.9;">Display this QR code at your workplace entrance for employees to scan and clock in/out</p>
+      <a href="attendance-qr.html" class="btn" style="background: white; color: #667eea; display: inline-block; text-decoration: none; font-weight: 600; padding: 14px 28px;">
+        View Attendance QR Code →
+      </a>
+    </div>
+
+    <div class="card">
+      <h2>Registered Employees</h2>
+      <div id="employeeList">Loading...</div>
+    </div>
+
+    <div class="card">
+      <h2>Generate Payroll Summary</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startDate">Start Date:</label>
+          <input type="date" id="startDate">
+        </div>
+        
+        <div class="form-group">
+          <label for="endDate">End Date:</label>
+          <input type="date" id="endDate">
+        </div>
+        
+        <div class="form-group">
+          <label style="visibility: hidden;">Action:</label>
+          <button id="generateBtn" class="btn btn-primary" style="width: 100%;">Generate Report</button>
+        </div>
+      </div>
+    </div>
+    
+    <div id="summarySection" style="display: none;">
+      <div class="card">
+        <div class="summary-header">
+          <h2>Payroll Summary</h2>
+          <button id="exportBtn" class="btn btn-secondary">Export CSV</button>
+        </div>
+        <div id="summaryTable"></div>
+      </div>
+      
+      <div class="card">
+        <h2>Detailed Attendance Records</h2>
+        <div id="detailsTable"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = window.location.origin + '/api';
+
+    // Check if admin is logged in
+    const adminData = sessionStorage.getItem('admin');
+    if (!adminData) {
+      // Not logged in as admin, redirect to login
+      window.location.href = 'login.html';
+    }
+
+    // Display admin name in navbar
+    const admin = JSON.parse(adminData);
+    document.getElementById('navAdminName').textContent = admin.name;
+
+    // Load employee list on page load
+    loadEmployeeList();
+
+    async function loadEmployeeList() {
+      try {
+        const response = await fetch(`${API_URL}/employees`);
+        const employees = await response.json();
+        
+        const listDiv = document.getElementById('employeeList');
+        
+        if (employees.length === 0) {
+          listDiv.innerHTML = '<p class="no-data">No employees registered yet</p>';
+          return;
+        }
+        
+        const html = `
+          <table>
+            <thead>
+              <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Registered</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${employees.map(emp => `
+                <tr>
+                  <td><strong>${emp.employee_id}</strong></td>
+                  <td>${emp.name}</td>
+                  <td>${emp.username}</td>
+                  <td>${new Date(emp.created_at).toLocaleDateString()}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div style="margin-top: 15px; padding: 15px; background: #f7fafc; border-radius: 8px; text-align: center;">
+            <strong>Total Employees:</strong> ${employees.length}
+          </div>
+        `;
+        
+        listDiv.innerHTML = html;
+      } catch (error) {
+        document.getElementById('employeeList').innerHTML = '<p class="no-data" style="color: #c33;">Error loading employees</p>';
+      }
+    }
+
+    // Set default dates (current pay period - last 14 days)
+    const today = new Date();
+    const twoWeeksAgo = new Date(today);
+    twoWeeksAgo.setDate(today.getDate() - 14);
+    
+    document.getElementById('endDate').valueAsDate = today;
+    document.getElementById('startDate').valueAsDate = twoWeeksAgo;
+
+    async function generateReport() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+      
+      if (!startDate || !endDate) {
+        alert('Please select both start and end dates');
+        return;
+      }
+
+      try {
+        // Get payroll summary
+        const summaryResponse = await fetch(`${API_URL}/payroll-summary?start_date=${startDate}&end_date=${endDate}`);
+        const summary = await summaryResponse.json();
+        
+        // Get detailed records
+        const detailsResponse = await fetch(`${API_URL}/attendance?start_date=${startDate}&end_date=${endDate}`);
+        const details = await detailsResponse.json();
+        
+        displaySummary(summary);
+        displayDetails(details);
+        
+        document.getElementById('summarySection').style.display = 'block';
+      } catch (error) {
+        alert('Error generating report: ' + error.message);
+      }
+    }
+
+    function displaySummary(summary) {
+      const tableDiv = document.getElementById('summaryTable');
+      
+      if (summary.length === 0) {
+        tableDiv.innerHTML = '<p class="no-data">No attendance records found for this period</p>';
+        return;
+      }
+      
+      const totalHours = summary.reduce((sum, emp) => sum + emp.total_hours, 0);
+      
+      const html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Employee ID</th>
+              <th>Name</th>
+              <th>Days Worked</th>
+              <th>Total Hours</th>
+              <th>Incomplete Records</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${summary.map(emp => `
+              <tr>
+                <td>${emp.employee_id}</td>
+                <td>${emp.name}</td>
+                <td>${emp.total_days}</td>
+                <td><strong>${emp.total_hours}</strong></td>
+                <td>${emp.incomplete_records > 0 ? `<span class="warning">${emp.incomplete_records}</span>` : '0'}</td>
+                <td>${emp.incomplete_records > 0 ? '<span class="status-warning">⚠ Review</span>' : '<span class="status-ok">✓ OK</span>'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3"><strong>TOTAL</strong></td>
+              <td><strong>${totalHours.toFixed(2)}</strong></td>
+              <td colspan="2"></td>
+            </tr>
+          </tfoot>
+        </table>
+      `;
+      
+      tableDiv.innerHTML = html;
+    }
+
+    function displayDetails(details) {
+      const tableDiv = document.getElementById('detailsTable');
+      
+      if (details.length === 0) {
+        tableDiv.innerHTML = '<p class="no-data">No detailed records found</p>';
+        return;
+      }
+      
+      const html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Employee</th>
+              <th>Clock In</th>
+              <th>Clock Out</th>
+              <th>Hours</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${details.map(record => `
+              <tr ${!record.clock_out ? 'class="incomplete"' : ''}>
+                <td>${new Date(record.clock_in).toLocaleDateString()}</td>
+                <td>${record.employee_name} (${record.employee_id})</td>
+                <td>${new Date(record.clock_in).toLocaleTimeString()}</td>
+                <td>${record.clock_out ? new Date(record.clock_out).toLocaleTimeString() : '<span class="warning">Not clocked out</span>'}</td>
+                <td>${record.hours_worked || '-'}</td>
+                <td>${record.notes || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+      
+      tableDiv.innerHTML = html;
+    }
+
+    function exportCSV() {
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+      
+      fetch(`${API_URL}/payroll-summary?start_date=${startDate}&end_date=${endDate}`)
+        .then(res => res.json())
+        .then(summary => {
+          const csv = [
+            ['Employee ID', 'Name', 'Days Worked', 'Total Hours', 'Incomplete Records'],
+            ...summary.map(emp => [
+              emp.employee_id,
+              emp.name,
+              emp.total_days,
+              emp.total_hours,
+              emp.incomplete_records
+            ])
+          ].map(row => row.join(',')).join('\n');
+          
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `payroll_${startDate}_to_${endDate}.csv`;
+          a.click();
+        });
+    }
+
+    function logout() {
+      sessionStorage.removeItem('admin');
+      window.location.href = 'login.html';
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', generateReport);
+    document.getElementById('exportBtn').addEventListener('click', exportCSV);
+  </script>
+</body>
+</html>
