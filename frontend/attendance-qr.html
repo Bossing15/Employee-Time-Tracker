@@ -3,9 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Attendance QR Code</title>
   <link rel="stylesheet" href="styles.css">
   <style>
+    body {
+      background: var(--main-bg);
+      padding: 0;
+      margin: 0;
+    }
+
+    .qr-page-container {
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95em;
+      transition: all 0.2s;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .back-button:hover {
+      background: var(--main-bg);
+      transform: translateX(-2px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .back-button-icon {
+      font-size: 1.1em;
+    }
+
+    .qr-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: 2em;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
     .qr-display {
       text-align: center;
       padding: 40px 20px;
@@ -32,8 +86,8 @@
     }
 
     .instructions-box {
-      background: #e6f2ff;
-      border-left: 4px solid #667eea;
+      background: #f0f9ff;
+      border-left: 4px solid var(--primary-color);
       padding: 20px;
       border-radius: 8px;
       margin: 30px auto;
@@ -42,7 +96,7 @@
     }
 
     .instructions-box h3 {
-      color: #667eea;
+      color: var(--primary-color);
       margin-bottom: 15px;
     }
 
@@ -53,6 +107,7 @@
 
     .instructions-box li {
       margin-bottom: 10px;
+      line-height: 1.6;
     }
 
     @media print {
@@ -60,7 +115,7 @@
         background: white;
       }
       
-      .card, .admin-link {
+      .back-button, .card {
         display: none;
       }
       
@@ -71,11 +126,16 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Attendance Check-In QR Code</h1>
-    
-    <div class="card">
-      <div class="qr-display">
+  <div class="qr-page-container">
+    <a href="admin.html" class="back-button">
+      <span class="back-button-icon">←</span>
+      <span>Back to Dashboard</span>
+    </a>
+
+    <div class="qr-content">
+      <h1 class="page-title">👁️ View Attendance QR Code</h1>
+      <div class="card">
+        <div class="qr-display">
         <h2>📱 Scan to Clock In/Out</h2>
         <p style="color: #666; margin-bottom: 20px;">Display this QR code at your workplace entrance</p>
         
@@ -97,13 +157,10 @@
         <div style="margin-top: 30px;">
           <button onclick="window.print()" class="btn btn-primary">🖨️ Print QR Code</button>
           <button onclick="refreshQR()" class="btn btn-secondary">🔄 Refresh QR Code</button>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="admin-link">
-      <a href="dashboard.html">← Back to Dashboard</a> | 
-      <a href="admin.html">Payroll Reports →</a>
     </div>
   </div>
 
