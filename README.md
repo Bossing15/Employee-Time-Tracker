@@ -4,13 +4,23 @@ A simple web-based employee attendance tracking system with QR code support.
 
 ## Features
 
-- **Employee Clock In/Out** - Track attendance with timestamps
-- **QR Code Scanning** - Quick attendance marking via QR codes
-- **Admin Dashboard** - Manage employees and view attendance
-- **Employee Management** - Add, edit, and delete employees
-- **Schedule Management** - Set work schedules for employees
-- **Attendance Reports** - View attendance history and statistics
-- **Work Hours Tracking** - Monitor daily, weekly, and monthly hours
+### Dashboard
+- **Overview Statistics** - Total employees, clocked in count, weekly hours
+- **QR Code Display** - Generate QR code for employee attendance
+- **Real-time Updates** - Live attendance status
+
+### Employee Management
+- **View Employees** - List all registered employees
+- **Add Employees** - Register new employees
+- **Edit Employees** - Update employee name and username
+- **Delete Employees** - Remove employees from system
+- **Set Schedules** - Configure work hours for each employee
+- **Activate/Deactivate** - Enable or disable employee accounts
+
+### Employee Features
+- **Clock In/Out** - Track attendance with timestamps
+- **View History** - See personal attendance records
+- **QR Code Access** - Quick login via QR code
 
 ## Requirements
 
@@ -73,16 +83,14 @@ A simple web-based employee attendance tracking system with QR code support.
 
 ### For Admins
 1. Login with admin credentials
-2. Access the admin dashboard
-3. View all employees
-4. Manage employee schedules
-5. View attendance reports
-6. Edit or delete employees
-
-### QR Code Feature
-1. Admin can generate QR codes for employees
-2. Display QR code at workplace entrance
-3. Employees scan to clock in/out quickly
+2. **Dashboard** - View statistics (total employees, clocked in, weekly hours)
+3. **Employees** - Manage all employees:
+   - View employee list
+   - Edit employee details (✏️ button)
+   - Set work schedules (⏰ button)
+   - Delete employees (🗑️ button)
+   - Activate/deactivate accounts
+4. **QR Code** - Display QR code for employee attendance
 
 ## Project Structure
 
@@ -134,11 +142,9 @@ Employee-Time-Tracker/
 - `POST /api/schedules/:employee_id` - Set schedule
 - `DELETE /api/schedules/:employee_id` - Delete schedule
 
-### Reports
-- `GET /api/work-hours/daily/:employee_id` - Daily hours
-- `GET /api/work-hours/weekly/:employee_id` - Weekly hours
-- `GET /api/work-hours/monthly/:employee_id` - Monthly hours
-- `GET /api/work-hours/summary` - All employees summary
+### QR Codes
+- `GET /api/qr/:employee_id` - Generate employee QR code
+- `GET /api/qr-attendance` - Generate attendance QR code
 
 ## Configuration
 
