@@ -152,6 +152,73 @@
       </div>
     </main>
 
+    <!-- Edit Employee Modal -->
+    <div id="editEmployeeModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">Edit Employee</h2>
+          <button class="modal-close" onclick="closeEditEmployeeModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editEmployeeId">
+          
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">Employee ID</label>
+            <input type="text" id="editEmployeeIdDisplay" disabled style="width: 100%; padding: 10px; background: #f3f4f6; border: 2px solid #e5e7eb; border-radius: 8px; color: #6b7280;">
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <label for="editEmployeeName" style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">Name</label>
+            <input type="text" id="editEmployeeName" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <label for="editEmployeeUsername" style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">Username</label>
+            <input type="text" id="editEmployeeUsername" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeEditEmployeeModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveEmployeeEdit()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notificationModal" class="modal" style="display: none;">
+      <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">
+          <h2 class="modal-title" id="notifTitle">Notification</h2>
+          <button class="modal-close" onclick="closeNotificationModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="notifIcon" style="text-align: center; font-size: 3em; margin-bottom: 15px;">ℹ️</div>
+          <p id="notifMessage" style="text-align: center; font-size: 1.1em; color: #374151; margin: 0;"></p>
+        </div>
+        <div class="modal-footer" style="justify-content: center;">
+          <button class="btn btn-primary" onclick="closeNotificationModal()" id="notifOkBtn">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="modal" style="display: none;">
+      <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+          <h2 class="modal-title" id="confirmTitle">Confirm Action</h2>
+          <button class="modal-close" onclick="closeConfirmationModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div id="confirmIcon" style="text-align: center; font-size: 3em; margin-bottom: 15px;">⚠️</div>
+          <p id="confirmMessage" style="font-size: 1em; color: #374151; margin: 0; white-space: pre-line;"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeConfirmationModal()">Cancel</button>
+          <button class="btn btn-danger" onclick="confirmAction()" id="confirmBtn">Confirm</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Schedule Modal -->
     <div id="scheduleModal" class="modal" style="display: none;">
       <div class="modal-content">
@@ -322,9 +389,17 @@
                       <span class="status-badge" data-employee-id="${emp.employee_id}" style="font-size: 0.8em; padding: 4px 8px;">-</span>
                     </td>
                     <td style="text-align: center;">
+                      <button class="action-btn action-btn-info" onclick="openEditEmployeeModal('${emp.employee_id}', '${emp.name.replace(/'/g, "\\'")}', '${emp.username}')" title="Edit Employee">
+                        <span>✏️</span>
+                      </button>
                       <button class="action-btn action-btn-info schedule-btn" data-employee-id="${emp.employee_id}" data-employee-name="${emp.name}" title="Set Work Schedule">
                         <span>⏰</span>
                       </button>
+                      ${emp.active === 1 ? `
+                        <button class="action-btn action-btn-danger" onclick="deleteEmployee('${emp.employee_id}', '${emp.name.replace(/'/g, "\\'")}')" title="Delete Employee">
+                          <span>🗑️</span>
+                        </button>
+                      ` : ''}
                     </td>
                   </tr>
                 `;
@@ -449,7 +524,7 @@
 
     async function saveSchedule() {
       if (!currentScheduleEmployeeId) {
-        alert('No employee selected');
+        showNotification('No employee selected', 'warning');
         return;
       }
       
@@ -462,7 +537,7 @@
       console.log('Saving schedule:', { currentScheduleEmployeeId, startTime, endTime, hours, minutes, expectedHours });
       
       if (!startTime || !endTime || (hours === 0 && minutes === 0)) {
-        alert('Please fill in all fields');
+        showNotification('Please fill in all fields', 'warning');
         return;
       }
       
@@ -485,15 +560,15 @@
         console.log('Response data:', data);
         
         if (response.ok) {
-          alert('✓ Schedule saved successfully');
+          showNotification('Schedule saved successfully', 'success');
           closeScheduleModal();
           loadEmployeeList();
         } else {
-          alert('Error: ' + (data.error || 'Failed to save schedule'));
+          showNotification(data.error || 'Failed to save schedule', 'error');
         }
       } catch (error) {
         console.error('Save schedule error:', error);
-        alert('Error: ' + error.message);
+        showNotification('Error: ' + error.message, 'error');
       }
     }
 
@@ -506,28 +581,174 @@
 
     function viewProfile(event) {
       event.preventDefault();
-      alert('Profile page coming soon!');
+      showNotification('Profile page coming soon!', 'info');
       toggleUserMenu();
     }
 
     function viewSettings(event) {
       event.preventDefault();
-      alert('Settings page coming soon!');
+      showNotification('Settings page coming soon!', 'info');
       toggleUserMenu();
     }
 
     function logout(event) {
       event.preventDefault();
-      if (confirm('Are you sure you want to logout?')) {
+      showConfirmation('Are you sure you want to logout?', () => {
         sessionStorage.removeItem('admin');
         window.location.href = 'employee-login.html';
+      }, 'Logout', '🚪', 'Logout');
+    }
+
+    // ============================================
+    // NOTIFICATION & CONFIRMATION MODALS
+    // ============================================
+
+    let confirmCallback = null;
+
+    function showNotification(message, type = 'info', title = null) {
+      const modal = document.getElementById('notificationModal');
+      const titleEl = document.getElementById('notifTitle');
+      const iconEl = document.getElementById('notifIcon');
+      const messageEl = document.getElementById('notifMessage');
+      const okBtn = document.getElementById('notifOkBtn');
+      
+      // Set title
+      if (title) {
+        titleEl.textContent = title;
+      } else {
+        titleEl.textContent = type === 'success' ? 'Success' : type === 'error' ? 'Error' : 'Notification';
       }
+      
+      // Set icon and colors based on type
+      if (type === 'success') {
+        iconEl.textContent = '✅';
+        okBtn.className = 'btn btn-primary';
+        okBtn.style.background = '#16a34a';
+      } else if (type === 'error') {
+        iconEl.textContent = '❌';
+        okBtn.className = 'btn btn-danger';
+      } else if (type === 'warning') {
+        iconEl.textContent = '⚠️';
+        okBtn.className = 'btn btn-primary';
+        okBtn.style.background = '#f59e0b';
+      } else {
+        iconEl.textContent = 'ℹ️';
+        okBtn.className = 'btn btn-primary';
+        okBtn.style.background = '';
+      }
+      
+      messageEl.textContent = message;
+      modal.style.display = 'flex';
+    }
+
+    function closeNotificationModal() {
+      document.getElementById('notificationModal').style.display = 'none';
+    }
+
+    function showConfirmation(message, callback, title = 'Confirm Action', icon = '⚠️', confirmText = 'Confirm') {
+      const modal = document.getElementById('confirmationModal');
+      const titleEl = document.getElementById('confirmTitle');
+      const iconEl = document.getElementById('confirmIcon');
+      const messageEl = document.getElementById('confirmMessage');
+      const confirmBtn = document.getElementById('confirmBtn');
+      
+      titleEl.textContent = title;
+      iconEl.textContent = icon;
+      messageEl.textContent = message;
+      confirmBtn.textContent = confirmText;
+      
+      confirmCallback = callback;
+      modal.style.display = 'flex';
+    }
+
+    function closeConfirmationModal() {
+      document.getElementById('confirmationModal').style.display = 'none';
+      confirmCallback = null;
+    }
+
+    function confirmAction() {
+      if (confirmCallback) {
+        confirmCallback();
+      }
+      closeConfirmationModal();
+    }
+
+    // ============================================
+    // CRUD OPERATIONS - EMPLOYEES
+    // ============================================
+
+    function openEditEmployeeModal(employeeId, name, username) {
+      document.getElementById('editEmployeeId').value = employeeId;
+      document.getElementById('editEmployeeIdDisplay').value = employeeId;
+      document.getElementById('editEmployeeName').value = name;
+      document.getElementById('editEmployeeUsername').value = username;
+      document.getElementById('editEmployeeModal').style.display = 'flex';
+    }
+
+    function closeEditEmployeeModal() {
+      document.getElementById('editEmployeeModal').style.display = 'none';
+    }
+
+    async function saveEmployeeEdit() {
+      const employeeId = document.getElementById('editEmployeeId').value;
+      const name = document.getElementById('editEmployeeName').value.trim();
+      const username = document.getElementById('editEmployeeUsername').value.trim();
+      
+      if (!name || !username) {
+        showNotification('Name and username are required', 'warning');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/employees/${employeeId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, username })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showNotification('Employee updated successfully', 'success');
+          closeEditEmployeeModal();
+          loadEmployeeList();
+        } else {
+          showNotification(data.error || 'Failed to update employee', 'error');
+        }
+      } catch (error) {
+        console.error('Update employee error:', error);
+        showNotification('Error: ' + error.message, 'error');
+      }
+    }
+
+    async function deleteEmployee(employeeId, name) {
+      const message = `Are you sure you want to PERMANENTLY DELETE ${name}?\n\nThis will remove:\n• Employee account\n• All attendance records\n• Schedule settings\n\nThis action CANNOT be undone!`;
+      
+      showConfirmation(message, async () => {
+        try {
+          const response = await fetch(`${API_URL}/employees/${employeeId}`, {
+            method: 'DELETE'
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            showNotification('Employee deleted successfully', 'success');
+            loadEmployeeList();
+          } else {
+            showNotification(data.error || 'Failed to delete employee', 'error');
+          }
+        } catch (error) {
+          console.error('Delete employee error:', error);
+          showNotification('Error: ' + error.message, 'error');
+        }
+      }, 'Delete Employee', '🗑️', 'Delete');
     }
 
     document.addEventListener('click', function(event) {
       const dropdown = document.getElementById('userDropdown');
       const button = document.querySelector('.navbar-user-button');
-      const modal = document.getElementById('scheduleModal');
+      const modals = ['scheduleModal', 'editEmployeeModal', 'notificationModal', 'confirmationModal'];
       
       // Close dropdown if clicking outside
       if (dropdown && button && !button.contains(event.target) && !dropdown.contains(event.target)) {
@@ -535,10 +756,19 @@
         button.classList.remove('open');
       }
       
-      // Close modal if clicking outside modal content
-      if (modal && event.target === modal) {
-        closeScheduleModal();
-      }
+      // Close modals if clicking outside modal content
+      modals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal && event.target === modal) {
+          if (modalId === 'notificationModal') {
+            closeNotificationModal();
+          } else if (modalId === 'confirmationModal') {
+            closeConfirmationModal();
+          } else {
+            modal.style.display = 'none';
+          }
+        }
+      });
     });
   </script>
 </body>
