@@ -38,9 +38,16 @@
         </ul>
       </div>
 
-
-
-
+      <div class="sidebar-section" style="margin-top: auto; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+        <ul class="sidebar-menu">
+          <li class="sidebar-menu-item">
+            <a href="#" class="sidebar-menu-link" onclick="showSection('settings'); return false;">
+              <span class="sidebar-menu-icon">⚙️</span>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </div>
     </aside>
 
     <!-- Main Content -->
@@ -100,7 +107,9 @@
         <!-- QR Code Card -->
         <div class="qr-card">
           <div class="qr-card-content">
-            <div class="qr-card-icon">📷</div>
+            <div class="qr-card-icon">
+              <img src="Images/qr (1).png" alt="QR Code" style="width: 48px; height: 48px;">
+            </div>
             <div class="qr-card-text">
               <h3 class="qr-card-title">Attendance QR Code</h3>
               <p class="qr-card-description">Display this QR code at your workplace entrance for employees to scan and clock in/out</p>
@@ -146,6 +155,61 @@
         </div>
       </div>
 
+      <!-- Settings Section -->
+      <div id="settings-section" class="content-section" style="display: none;">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">⚙️ Account Settings</h2>
+          </div>
+          
+          <!-- Account Information -->
+          <div style="margin-bottom: 30px;">
+            <h3 style="font-size: 1.1em; font-weight: 600; color: #1f2937; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e5e7eb;">Account Information</h3>
+            
+            <div style="background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 20px;">
+              <div style="display: grid; grid-template-columns: 120px 1fr; gap: 15px; font-size: 0.95em;">
+                <div style="color: #6b7280; font-weight: 500;">Name:</div>
+                <div style="color: #1f2937; font-weight: 600;" id="settingsAdminName">-</div>
+                
+                <div style="color: #6b7280; font-weight: 500;">Username:</div>
+                <div style="color: #1f2937; font-weight: 600;" id="settingsAdminUsername">-</div>
+                
+                <div style="color: #6b7280; font-weight: 500;">Role:</div>
+                <div style="color: #1f2937; font-weight: 600;">Administrator</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Change Password -->
+          <div>
+            <h3 style="font-size: 1.1em; font-weight: 600; color: #1f2937; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e5e7eb;">Change Password</h3>
+            
+            <div style="max-width: 500px;">
+              <div style="margin-bottom: 20px;">
+                <label for="currentPassword" style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">Current Password</label>
+                <input type="password" id="currentPassword" placeholder="Enter current password" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+              </div>
+              
+              <div style="margin-bottom: 20px;">
+                <label for="newPassword" style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">New Password</label>
+                <input type="password" id="newPassword" placeholder="Enter new password" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+                <div style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">Must be at least 6 characters long</div>
+              </div>
+              
+              <div style="margin-bottom: 20px;">
+                <label for="confirmPassword" style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">Confirm New Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm new password" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+              </div>
+              
+              <button class="btn btn-primary" onclick="changePassword()">
+                <span>🔒</span>
+                Change Password
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
         </div>
       </div>
 
@@ -156,7 +220,10 @@
     <div id="editEmployeeModal" class="modal" style="display: none;">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title">Edit Employee</h2>
+          <h2 class="modal-title">
+            <img src="Images/pen.png" alt="Edit" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 10px;">
+            Edit Employee
+          </h2>
           <button class="modal-close" onclick="closeEditEmployeeModal()">✕</button>
         </div>
         <div class="modal-body">
@@ -180,6 +247,46 @@
         <div class="modal-footer">
           <button class="btn btn-secondary" onclick="closeEditEmployeeModal()">Cancel</button>
           <button class="btn btn-primary" onclick="saveEmployeeEdit()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">
+            👤 My Profile
+          </h2>
+          <button class="modal-close" onclick="closeProfileModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: inline-flex; align-items: center; justify-content: center; font-size: 2.5em; color: white; font-weight: bold; margin-bottom: 15px;" id="profileAvatar">A</div>
+            <div style="font-size: 1.2em; font-weight: 600; color: #1f2937;" id="profileNameDisplay">Admin</div>
+            <div style="font-size: 0.9em; color: #6b7280; margin-top: 5px;" id="profileUsernameDisplay">@admin</div>
+            <div style="display: inline-block; margin-top: 10px; padding: 4px 12px; background: #dbeafe; color: #1e40af; border-radius: 12px; font-size: 0.85em; font-weight: 600;">Administrator</div>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <label for="profileName" style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">Full Name</label>
+            <input type="text" id="profileName" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">Username</label>
+            <input type="text" id="profileUsername" disabled style="width: 100%; padding: 10px; background: #f3f4f6; border: 2px solid #e5e7eb; border-radius: 8px; color: #6b7280; font-size: 1em;">
+            <div style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">Username cannot be changed</div>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+            <div style="font-size: 0.9em; color: #6b7280; margin-bottom: 8px;">Account Created</div>
+            <div style="font-weight: 600; color: #1f2937;" id="profileCreatedAt">-</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeProfileModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
         </div>
       </div>
     </div>
@@ -223,7 +330,10 @@
     <div id="scheduleModal" class="modal" style="display: none;">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title">Set Work Schedule</h2>
+          <h2 class="modal-title">
+            <img src="Images/alarm-clock.png" alt="Schedule" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 10px;">
+            Set Work Schedule
+          </h2>
           <button class="modal-close" onclick="closeScheduleModal()">✕</button>
         </div>
         <div class="modal-body">
@@ -255,6 +365,8 @@
               </div>
             </div>
           </div>
+          
+
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" onclick="closeScheduleModal()">Cancel</button>
@@ -390,14 +502,14 @@
                     </td>
                     <td style="text-align: center;">
                       <button class="action-btn action-btn-info" onclick="openEditEmployeeModal('${emp.employee_id}', '${emp.name.replace(/'/g, "\\'")}', '${emp.username}')" title="Edit Employee">
-                        <span>✏️</span>
+                        <img src="Images/pen.png" alt="Edit" style="width: 18px; height: 18px;">
                       </button>
                       <button class="action-btn action-btn-info schedule-btn" data-employee-id="${emp.employee_id}" data-employee-name="${emp.name}" title="Set Work Schedule">
-                        <span>⏰</span>
+                        <img src="Images/alarm-clock.png" alt="Schedule" style="width: 18px; height: 18px;">
                       </button>
                       ${emp.active === 1 ? `
                         <button class="action-btn action-btn-danger" onclick="deleteEmployee('${emp.employee_id}', '${emp.name.replace(/'/g, "\\'")}')" title="Delete Employee">
-                          <span>🗑️</span>
+                          <img src="Images/delete.png" alt="Delete" style="width: 18px; height: 18px;">
                         </button>
                       ` : ''}
                     </td>
@@ -436,7 +548,12 @@
     async function loadEmployeeStatus(employeeId) {
       try {
         const today = new Date();
-        const dateStr = today.toISOString().split('T')[0];
+        // Use local date instead of UTC to avoid timezone issues
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+        
         const response = await fetch(`${API_URL}/attendance-status/${employeeId}?start_date=${dateStr}&end_date=${dateStr}`);
         const data = await response.json();
         
@@ -543,7 +660,11 @@
       
       try {
         const url = `${API_URL}/schedules/${currentScheduleEmployeeId}`;
-        const payload = { start_time: startTime, end_time: endTime, expected_hours: expectedHours };
+        const payload = { 
+          start_time: startTime, 
+          end_time: endTime, 
+          expected_hours: expectedHours
+        };
         
         console.log('POST to:', url);
         console.log('Payload:', payload);
@@ -581,13 +702,104 @@
 
     function viewProfile(event) {
       event.preventDefault();
-      showNotification('Profile page coming soon!', 'info');
+      openProfileModal();
       toggleUserMenu();
+    }
+
+    function openProfileModal() {
+      const adminData = sessionStorage.getItem('admin');
+      if (!adminData) {
+        window.location.href = 'employee-login.html';
+        return;
+      }
+      
+      const admin = JSON.parse(adminData);
+      
+      // Set avatar initial
+      const initial = admin.name.charAt(0).toUpperCase();
+      document.getElementById('profileAvatar').textContent = initial;
+      
+      // Set profile information
+      document.getElementById('profileNameDisplay').textContent = admin.name;
+      document.getElementById('profileUsernameDisplay').textContent = '@' + admin.username;
+      document.getElementById('profileName').value = admin.name;
+      document.getElementById('profileUsername').value = admin.username;
+      
+      // Format created date
+      if (admin.created_at) {
+        const date = new Date(admin.created_at);
+        document.getElementById('profileCreatedAt').textContent = date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+      
+      document.getElementById('profileModal').style.display = 'flex';
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').style.display = 'none';
+    }
+
+    async function saveProfile() {
+      const adminData = sessionStorage.getItem('admin');
+      if (!adminData) {
+        showNotification('Session expired. Please login again.', 'error');
+        window.location.href = 'employee-login.html';
+        return;
+      }
+      
+      const admin = JSON.parse(adminData);
+      const newName = document.getElementById('profileName').value.trim();
+      
+      if (!newName) {
+        showNotification('Name cannot be empty', 'warning');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/admins/${admin.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newName })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Update session storage
+          admin.name = newName;
+          sessionStorage.setItem('admin', JSON.stringify(admin));
+          
+          // Update UI
+          document.getElementById('navUserName').textContent = newName;
+          document.getElementById('dropdownName').textContent = newName;
+          const initial = newName.charAt(0).toUpperCase();
+          document.getElementById('navUserAvatar').textContent = initial;
+          
+          // Update settings page if loaded
+          const settingsName = document.getElementById('settingsAdminName');
+          if (settingsName) {
+            settingsName.textContent = newName;
+          }
+          
+          showNotification('Profile updated successfully', 'success');
+          closeProfileModal();
+        } else {
+          showNotification(data.error || 'Failed to update profile', 'error');
+        }
+      } catch (error) {
+        console.error('Update profile error:', error);
+        showNotification('Error: ' + error.message, 'error');
+      }
     }
 
     function viewSettings(event) {
       event.preventDefault();
-      showNotification('Settings page coming soon!', 'info');
+      showSection('settings');
       toggleUserMenu();
     }
 
@@ -653,7 +865,14 @@
       const confirmBtn = document.getElementById('confirmBtn');
       
       titleEl.textContent = title;
-      iconEl.textContent = icon;
+      
+      // Check if icon is an image path or emoji
+      if (icon.includes('.png') || icon.includes('.jpg') || icon.includes('.svg')) {
+        iconEl.innerHTML = `<img src="${icon}" alt="Icon" style="width: 64px; height: 64px;">`;
+      } else {
+        iconEl.textContent = icon;
+      }
+      
       messageEl.textContent = message;
       confirmBtn.textContent = confirmText;
       
@@ -742,13 +961,103 @@
           console.error('Delete employee error:', error);
           showNotification('Error: ' + error.message, 'error');
         }
-      }, 'Delete Employee', '🗑️', 'Delete');
+      }, 'Delete Employee', 'Images/delete.png', 'Delete');
     }
+
+    // ============================================
+    // SETTINGS FUNCTIONS
+    // ============================================
+
+    function loadSettings() {
+      // Display admin info
+      const adminData = sessionStorage.getItem('admin');
+      if (adminData) {
+        const admin = JSON.parse(adminData);
+        document.getElementById('settingsAdminName').textContent = admin.name;
+        document.getElementById('settingsAdminUsername').textContent = admin.username;
+      }
+    }
+
+    async function changePassword() {
+      const currentPassword = document.getElementById('currentPassword').value.trim();
+      const newPassword = document.getElementById('newPassword').value.trim();
+      const confirmPassword = document.getElementById('confirmPassword').value.trim();
+      
+      // Validation
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        showNotification('Please fill in all password fields', 'warning');
+        return;
+      }
+      
+      if (newPassword.length < 6) {
+        showNotification('New password must be at least 6 characters long', 'warning');
+        return;
+      }
+      
+      if (newPassword !== confirmPassword) {
+        showNotification('New passwords do not match', 'warning');
+        return;
+      }
+      
+      try {
+        const adminData = sessionStorage.getItem('admin');
+        if (!adminData) {
+          showNotification('Session expired. Please login again.', 'error');
+          window.location.href = 'employee-login.html';
+          return;
+        }
+        
+        const admin = JSON.parse(adminData);
+        
+        // First verify current password by attempting login
+        const loginResponse = await fetch(`${API_URL}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            username: admin.username, 
+            password: currentPassword 
+          })
+        });
+        
+        if (!loginResponse.ok) {
+          showNotification('Current password is incorrect', 'error');
+          return;
+        }
+        
+        // Change password (we'll need to add this endpoint to the backend)
+        const response = await fetch(`${API_URL}/admins/${admin.id}/change-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            old_password: currentPassword,
+            new_password: newPassword 
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showNotification('Password changed successfully', 'success');
+          // Clear password fields
+          document.getElementById('currentPassword').value = '';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('confirmPassword').value = '';
+        } else {
+          showNotification(data.error || 'Failed to change password', 'error');
+        }
+      } catch (error) {
+        console.error('Change password error:', error);
+        showNotification('Error: ' + error.message, 'error');
+      }
+    }
+
+    // Load settings on page load
+    loadSettings();
 
     document.addEventListener('click', function(event) {
       const dropdown = document.getElementById('userDropdown');
       const button = document.querySelector('.navbar-user-button');
-      const modals = ['scheduleModal', 'editEmployeeModal', 'notificationModal', 'confirmationModal'];
+      const modals = ['scheduleModal', 'editEmployeeModal', 'profileModal', 'notificationModal', 'confirmationModal'];
       
       // Close dropdown if clicking outside
       if (dropdown && button && !button.contains(event.target) && !dropdown.contains(event.target)) {

@@ -354,33 +354,7 @@ app.get('/api/attendance', (req, res) => {
   });
 });
 
-app.get('/api/payroll-summary', (req, res) => {
-  const { start_date, end_date } = req.query;
-  
-  if (!start_date || !end_date) {
-    return res.status(400).json({ error: 'start_date and end_date are required' });
-  }
-  
-  db.all(`
-    SELECT 
-      e.employee_id,
-      e.name,
-      COUNT(a.id) as total_days,
-      ROUND(SUM(COALESCE(a.hours_worked, 0)), 2) as total_hours,
-      COUNT(CASE WHEN a.clock_out IS NULL THEN 1 END) as incomplete_records
-    FROM employees e
-    LEFT JOIN attendance a ON e.employee_id = a.employee_id
-      AND date(a.clock_in) >= date(?)
-      AND date(a.clock_in) <= date(?)
-    GROUP BY e.employee_id, e.name
-    ORDER BY e.name
-  `, [start_date, end_date], (err, summary) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    res.json(summary);
-  });
-});
+
 
 // Detection functions for Late, Undertime, and Overtime
 function detectAttendanceStatus(clockInTime, clockOutTime, expectedStartTime = '09:00', expectedEndTime = '17:00', expectedHours = 8) {
@@ -448,6 +422,19 @@ app.get('/api/attendance-status/:employee_id', (req, res) => {
     const expectedEnd = schedule?.end_time || '17:00';
     const expectedHours = schedule?.expected_hours || 8;
     
+    console.log(`[Attendance Status] Employee: ${employee_id}, Date range: ${start_date} to ${end_date}`);
+    
+    // First, let's see ALL records for this employee to debug
+    db.all(`SELECT * FROM attendance WHERE employee_id = ? ORDER BY clock_in DESC LIMIT 5`, [employee_id], (err, allRecords) => {
+      if (!err && allRecords) {
+        console.log(`[Attendance Status] Last 5 records for ${employee_id}:`, allRecords.map(r => ({
+          id: r.id,
+          clock_in: r.clock_in,
+          date_extracted: r.clock_in ? new Date(r.clock_in).toISOString().split('T')[0] : null
+        })));
+      }
+    });
+    
     db.all(`
       SELECT * FROM attendance 
       WHERE employee_id = ? 
@@ -456,8 +443,11 @@ app.get('/api/attendance-status/:employee_id', (req, res) => {
       ORDER BY clock_in DESC
     `, [employee_id, start_date, end_date], (err, records) => {
       if (err) {
+        console.error('[Attendance Status] Database error:', err);
         return res.status(500).json({ error: 'Database error occurred' });
       }
+      
+      console.log(`[Attendance Status] Found ${records.length} records for employee ${employee_id} on ${start_date}`);
       
       const statusRecords = records.map(record => {
         // For incomplete records (no clock_out), only check if late
@@ -619,7 +609,8 @@ app.post('/api/schedules/:employee_id', (req, res) => {
     if (existing) {
       db.run(`
         UPDATE employee_schedules 
-        SET start_time = ?, end_time = ?, expected_hours = ?, updated_at = CURRENT_TIMESTAMP
+        SET start_time = ?, end_time = ?, expected_hours = ?, 
+            updated_at = CURRENT_TIMESTAMP
         WHERE employee_id = ?
       `, [start_time, end_time, expected_hours, employee_id], function(err) {
         if (err) {
@@ -1169,300 +1160,6 @@ app.get('/api/work-hours/summary', (req, res) => {
 // FULL CRUD OPERATIONS
 // ============================================
 
-// UPDATE Employee Details
-app.put('/api/employees/:employee_id', async (req, res) => {
-  const { employee_id } = req.params;
-  const { start_date, end_date } = req.query;
-  
-  if (!start_date || !end_date) {
-    return res.status(400).json({ error: 'start_date and end_date are required' });
-  }
-  
-  // Get employee info and schedule
-  db.get('SELECT * FROM employees WHERE employee_id = ?', [employee_id], (err, employee) => {
-    if (err) {
-      return res.status(500).json({ error: 'Database error occurred' });
-    }
-    
-    if (!employee) {
-      return res.status(404).json({ error: 'Employee not found' });
-    }
-    
-    db.get('SELECT * FROM employee_schedules WHERE employee_id = ?', [employee_id], (err, schedule) => {
-      if (err) {
-        return res.status(500).json({ error: 'Database error occurred' });
-      }
-      
-      const expectedStart = schedule?.start_time || '09:00';
-      const expectedEnd = schedule?.end_time || '17:00';
-      const expectedHours = schedule?.expected_hours || 8;
-      
-      // Get all attendance records for the period
-      db.all(`
-        SELECT * FROM attendance 
-        WHERE employee_id = ? 
-          AND date(clock_in) >= date(?)
-          AND date(clock_in) <= date(?)
-        ORDER BY clock_in DESC
-      `, [employee_id, start_date, end_date], (err, records) => {
-        if (err) {
-          return res.status(500).json({ error: 'Database error occurred' });
-        }
-        
-        // Analyze records
-        const completedRecords = records.filter(r => r.clock_out !== null);
-        const incompleteRecords = records.filter(r => r.clock_out === null);
-        
-        let totalHours = 0;
-        let lateCount = 0;
-        let undertimeCount = 0;
-        let overtimeCount = 0;
-        let totalLateMinutes = 0;
-        let totalUndertimeHours = 0;
-        let totalOvertimeHours = 0;
-        
-        const detailedRecords = records.map(record => {
-          if (!record.clock_out) {
-            return {
-              ...record,
-              status: 'incomplete',
-              isLate: false,
-              isUndertime: false,
-              isOvertime: false
-            };
-          }
-          
-          const status = detectAttendanceStatus(
-            record.clock_in, 
-            record.clock_out, 
-            expectedStart, 
-            expectedEnd, 
-            expectedHours
-          );
-          
-          totalHours += record.hours_worked || 0;
-          
-          if (status.isLate) {
-            lateCount++;
-            totalLateMinutes += status.lateMinutes;
-          }
-          if (status.isUndertime) {
-            undertimeCount++;
-            totalUndertimeHours += status.undertimeHours;
-          }
-          if (status.isOvertime) {
-            overtimeCount++;
-            totalOvertimeHours += status.overtimeHours;
-          }
-          
-          return {
-            ...record,
-            ...status,
-            status: 'completed'
-          };
-        });
-        
-        // Calculate expected work days (excluding weekends)
-        const startDateObj = new Date(start_date);
-        const endDateObj = new Date(end_date);
-        let expectedWorkDays = 0;
-        
-        for (let d = new Date(startDateObj); d <= endDateObj; d.setDate(d.getDate() + 1)) {
-          const dayOfWeek = d.getDay();
-          if (dayOfWeek !== 0 && dayOfWeek !== 6) { // Not Sunday or Saturday
-            expectedWorkDays++;
-          }
-        }
-        
-        const actualWorkDays = new Set(records.map(r => r.clock_in.split(' ')[0])).size;
-        const missingDays = expectedWorkDays - actualWorkDays;
-        const expectedTotalHours = expectedWorkDays * expectedHours;
-        
-        res.json({
-          employee: {
-            employee_id: employee.employee_id,
-            name: employee.name,
-            username: employee.username
-          },
-          period: {
-            start_date,
-            end_date,
-            days: Math.ceil((endDateObj - startDateObj) / (1000 * 60 * 60 * 24)) + 1
-          },
-          schedule: {
-            start_time: expectedStart,
-            end_time: expectedEnd,
-            expected_hours: expectedHours
-          },
-          summary: {
-            total_records: records.length,
-            completed_records: completedRecords.length,
-            incomplete_records: incompleteRecords.length,
-            actual_work_days: actualWorkDays,
-            expected_work_days: expectedWorkDays,
-            missing_days: missingDays,
-            total_hours_worked: Math.round(totalHours * 100) / 100,
-            expected_total_hours: Math.round(expectedTotalHours * 100) / 100,
-            hours_variance: Math.round((totalHours - expectedTotalHours) * 100) / 100,
-            late_count: lateCount,
-            undertime_count: undertimeCount,
-            overtime_count: overtimeCount,
-            total_late_minutes: totalLateMinutes,
-            total_undertime_hours: Math.round(totalUndertimeHours * 100) / 100,
-            total_overtime_hours: Math.round(totalOvertimeHours * 100) / 100,
-            attendance_rate: expectedWorkDays > 0 ? Math.round((actualWorkDays / expectedWorkDays) * 100) : 0
-          },
-          records: detailedRecords
-        });
-      });
-    });
-  });
-});
-
-// Generate Payroll Attendance Summary for All Employees
-app.get('/api/reports/payroll-summary', (req, res) => {
-  const { start_date, end_date } = req.query;
-  
-  if (!start_date || !end_date) {
-    return res.status(400).json({ error: 'start_date and end_date are required' });
-  }
-  
-  db.all('SELECT * FROM employees WHERE active = 1 ORDER BY name', [], (err, employees) => {
-    if (err) {
-      return res.status(500).json({ error: 'Database error occurred' });
-    }
-    
-    // Get all schedules
-    db.all('SELECT * FROM employee_schedules', [], (err, schedules) => {
-      if (err) {
-        return res.status(500).json({ error: 'Database error occurred' });
-      }
-      
-      const scheduleMap = {};
-      schedules.forEach(s => {
-        scheduleMap[s.employee_id] = s;
-      });
-      
-      // Get attendance for all employees
-      db.all(`
-        SELECT 
-          employee_id,
-          date(clock_in) as work_date,
-          clock_in,
-          clock_out,
-          hours_worked
-        FROM attendance
-        WHERE date(clock_in) >= date(?)
-          AND date(clock_in) <= date(?)
-        ORDER BY employee_id, clock_in
-      `, [start_date, end_date], (err, allRecords) => {
-        if (err) {
-          return res.status(500).json({ error: 'Database error occurred' });
-        }
-        
-        // Group records by employee
-        const recordsByEmployee = {};
-        allRecords.forEach(record => {
-          if (!recordsByEmployee[record.employee_id]) {
-            recordsByEmployee[record.employee_id] = [];
-          }
-          recordsByEmployee[record.employee_id].push(record);
-        });
-        
-        // Calculate expected work days
-        const startDateObj = new Date(start_date);
-        const endDateObj = new Date(end_date);
-        let expectedWorkDays = 0;
-        
-        for (let d = new Date(startDateObj); d <= endDateObj; d.setDate(d.getDate() + 1)) {
-          const dayOfWeek = d.getDay();
-          if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-            expectedWorkDays++;
-          }
-        }
-        
-        // Process each employee
-        const employeeSummaries = employees.map(emp => {
-          const schedule = scheduleMap[emp.employee_id];
-          const expectedHours = schedule?.expected_hours || 8;
-          const expectedStart = schedule?.start_time || '09:00';
-          const expectedEnd = schedule?.end_time || '17:00';
-          
-          const records = recordsByEmployee[emp.employee_id] || [];
-          const completedRecords = records.filter(r => r.clock_out !== null);
-          const incompleteRecords = records.filter(r => r.clock_out === null);
-          
-          let totalHours = 0;
-          let lateCount = 0;
-          let undertimeCount = 0;
-          let overtimeCount = 0;
-          
-          completedRecords.forEach(record => {
-            totalHours += record.hours_worked || 0;
-            
-            const status = detectAttendanceStatus(
-              record.clock_in,
-              record.clock_out,
-              expectedStart,
-              expectedEnd,
-              expectedHours
-            );
-            
-            if (status.isLate) lateCount++;
-            if (status.isUndertime) undertimeCount++;
-            if (status.isOvertime) overtimeCount++;
-          });
-          
-          const actualWorkDays = new Set(records.map(r => r.work_date)).size;
-          const missingDays = expectedWorkDays - actualWorkDays;
-          const expectedTotalHours = expectedWorkDays * expectedHours;
-          
-          return {
-            employee_id: emp.employee_id,
-            name: emp.name,
-            total_records: records.length,
-            completed_records: completedRecords.length,
-            incomplete_records: incompleteRecords.length,
-            actual_work_days: actualWorkDays,
-            expected_work_days: expectedWorkDays,
-            missing_days: missingDays,
-            total_hours_worked: Math.round(totalHours * 100) / 100,
-            expected_total_hours: Math.round(expectedTotalHours * 100) / 100,
-            hours_variance: Math.round((totalHours - expectedTotalHours) * 100) / 100,
-            late_count: lateCount,
-            undertime_count: undertimeCount,
-            overtime_count: overtimeCount,
-            attendance_rate: expectedWorkDays > 0 ? Math.round((actualWorkDays / expectedWorkDays) * 100) : 0,
-            expected_hours_per_day: expectedHours
-          };
-        });
-        
-        // Calculate totals
-        const totals = {
-          total_employees: employees.length,
-          total_hours_worked: employeeSummaries.reduce((sum, e) => sum + e.total_hours_worked, 0),
-          total_expected_hours: employeeSummaries.reduce((sum, e) => sum + e.expected_total_hours, 0),
-          total_incomplete_records: employeeSummaries.reduce((sum, e) => sum + e.incomplete_records, 0),
-          total_missing_days: employeeSummaries.reduce((sum, e) => sum + e.missing_days, 0),
-          average_attendance_rate: employees.length > 0 
-            ? Math.round(employeeSummaries.reduce((sum, e) => sum + e.attendance_rate, 0) / employees.length)
-            : 0
-        };
-        
-        res.json({
-          period: {
-            start_date,
-            end_date,
-            expected_work_days: expectedWorkDays
-          },
-          totals,
-          employees: employeeSummaries
-        });
-      });
-    });
-  });
-});
-
 // Error & Missing Log Notifications
 app.get('/api/reports/errors-and-missing', (req, res) => {
   const { start_date, end_date } = req.query;
@@ -1633,19 +1330,20 @@ app.put('/api/employees/:employee_id', async (req, res) => {
           params.push(username);
         }
         
-        updates.push('updated_at = CURRENT_TIMESTAMP');
         params.push(employee_id);
         
         const query = `UPDATE employees SET ${updates.join(', ')} WHERE employee_id = ?`;
         
         db.run(query, params, function(err) {
           if (err) {
-            return res.status(500).json({ error: 'Database error occurred' });
+            console.error('Update employee database error:', err);
+            return res.status(500).json({ error: 'Database error: ' + err.message });
           }
           
           db.get('SELECT id, employee_id, name, username, active, created_at FROM employees WHERE employee_id = ?', [employee_id], (err, updated) => {
             if (err) {
-              return res.status(500).json({ error: 'Database error occurred' });
+              console.error('Fetch updated employee error:', err);
+              return res.status(500).json({ error: 'Database error: ' + err.message });
             }
             res.json({ success: true, employee: updated });
           });
@@ -1690,8 +1388,98 @@ app.post('/api/employees/:employee_id/change-password', async (req, res) => {
       // Hash new password
       const hashedPassword = await hashPassword(new_password);
       
-      db.run('UPDATE employees SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE employee_id = ?', 
+      db.run('UPDATE employees SET password = ? WHERE employee_id = ?', 
         [hashedPassword, employee_id], 
+        function(err) {
+          if (err) {
+            console.error('Password update error:', err);
+            return res.status(500).json({ error: 'Database error occurred: ' + err.message });
+          }
+          res.json({ success: true, message: 'Password changed successfully' });
+        }
+      );
+    });
+  } catch (error) {
+    console.error('Change password error:', error);
+    res.status(500).json({ error: 'Server error occurred' });
+  }
+});
+
+// Update Admin Profile
+app.put('/api/admins/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+  
+  try {
+    db.get('SELECT * FROM admins WHERE id = ?', [id], (err, admin) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error occurred' });
+      }
+      
+      if (!admin) {
+        return res.status(404).json({ error: 'Admin not found' });
+      }
+      
+      db.run('UPDATE admins SET name = ? WHERE id = ?', 
+        [name.trim(), id], 
+        function(err) {
+          if (err) {
+            return res.status(500).json({ error: 'Database error occurred' });
+          }
+          
+          db.get('SELECT id, username, name, created_at FROM admins WHERE id = ?', [id], (err, updated) => {
+            if (err) {
+              return res.status(500).json({ error: 'Database error occurred' });
+            }
+            res.json({ success: true, admin: updated });
+          });
+        }
+      );
+    });
+  } catch (error) {
+    console.error('Update admin error:', error);
+    res.status(500).json({ error: 'Server error occurred' });
+  }
+});
+
+// Change Admin Password
+app.post('/api/admins/:id/change-password', async (req, res) => {
+  const { id } = req.params;
+  const { old_password, new_password } = req.body;
+  
+  if (!old_password || !new_password) {
+    return res.status(400).json({ error: 'Both old and new passwords are required' });
+  }
+  
+  if (new_password.length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters long' });
+  }
+  
+  try {
+    db.get('SELECT * FROM admins WHERE id = ?', [id], async (err, admin) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error occurred' });
+      }
+      
+      if (!admin) {
+        return res.status(404).json({ error: 'Admin not found' });
+      }
+      
+      // Verify old password
+      const isValid = await verifyPassword(old_password, admin.password);
+      if (!isValid) {
+        return res.status(401).json({ error: 'Current password is incorrect' });
+      }
+      
+      // Hash new password
+      const hashedPassword = await hashPassword(new_password);
+      
+      db.run('UPDATE admins SET password = ? WHERE id = ?', 
+        [hashedPassword, id], 
         function(err) {
           if (err) {
             return res.status(500).json({ error: 'Database error occurred' });
@@ -1701,7 +1489,7 @@ app.post('/api/employees/:employee_id/change-password', async (req, res) => {
       );
     });
   } catch (error) {
-    console.error('Change password error:', error);
+    console.error('Change admin password error:', error);
     res.status(500).json({ error: 'Server error occurred' });
   }
 });
@@ -1926,6 +1714,7 @@ app.post('/api/migrate', (req, res) => {
     if (err) {
       return res.status(500).json({ error: 'Migration failed: ' + err.message });
     }
+    
     res.json({ success: true, message: 'Database migrated successfully' });
   });
 });

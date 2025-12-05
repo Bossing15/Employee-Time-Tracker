@@ -296,6 +296,142 @@
       font-size: 1.2em;
     }
 
+    .menu-button {
+      position: relative;
+      padding: 8px;
+      background: #f3f4f6;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1.2em;
+    }
+
+    .menu-dropdown {
+      display: none;
+      position: absolute;
+      top: 45px;
+      right: 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      min-width: 200px;
+      z-index: 1000;
+    }
+
+    .menu-dropdown.show {
+      display: block;
+    }
+
+    .menu-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #f3f4f6;
+      transition: background 0.2s;
+    }
+
+    .menu-item:hover {
+      background: #f9fafb;
+    }
+
+    .menu-item:last-child {
+      border-bottom: none;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .menu-item:first-child {
+      border-radius: 12px 12px 0 0;
+    }
+
+    .menu-item.danger {
+      color: #dc2626;
+    }
+
+    .menu-icon {
+      font-size: 1.2em;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      max-width: 500px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      padding: 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-size: 1.3em;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5em;
+      cursor: pointer;
+      color: #6b7280;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-footer {
+      padding: 20px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
     @media (max-width: 480px) {
       body {
         padding: 5px;
@@ -336,7 +472,23 @@
             <div class="navbar-logo">⏰</div>
             <div class="navbar-title">Attendance</div>
           </div>
-          <button onclick="logout()" style="padding: 6px 12px; background: #e5e7eb; color: #374151; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; font-size: 0.85em;">Logout</button>
+          <div style="position: relative;">
+            <button class="menu-button" onclick="toggleMenu()">⋮</button>
+            <div class="menu-dropdown" id="menuDropdown">
+              <div class="menu-item" onclick="openProfileModal()">
+                <span class="menu-icon">👤</span>
+                <span>My Profile</span>
+              </div>
+              <div class="menu-item" onclick="openSettingsModal()">
+                <span class="menu-icon">⚙️</span>
+                <span>Settings</span>
+              </div>
+              <div class="menu-item danger" onclick="logout()">
+                <span class="menu-icon">🚪</span>
+                <span>Logout</span>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="user-info">
           <div class="employee-name" id="employeeName">-</div>
@@ -393,6 +545,9 @@
           </div>
           
           <div id="clockOutSection" style="display: none;">
+            <!-- Separator Line -->
+            <div style="height: 2px; background: linear-gradient(to right, transparent, #e5e7eb 20%, #e5e7eb 80%, transparent); margin: 20px 0;"></div>
+            
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
               <div style="background: #f3f4f6; padding: 16px; border-radius: 10px; text-align: center;">
                 <div style="font-size: 0.8em; color: #6b7280; font-weight: 600; margin-bottom: 6px;">Clock Out</div>
@@ -425,6 +580,75 @@
     </div>
   </div>
 
+  <!-- Profile Modal -->
+  <div id="profileModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">👤 My Profile</h2>
+        <button class="modal-close" onclick="closeProfileModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="text-align: center; margin-bottom: 25px;">
+          <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: inline-flex; align-items: center; justify-content: center; font-size: 2em; color: white; font-weight: bold; margin-bottom: 12px;" id="profileAvatar">E</div>
+          <div style="font-size: 1.1em; font-weight: 600; color: #1f2937;" id="profileNameDisplay">Employee</div>
+          <div style="font-size: 0.85em; color: #6b7280; margin-top: 5px;" id="profileIdDisplay">EMP001</div>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937; font-size: 0.9em;">Full Name</label>
+          <input type="text" id="profileName" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937; font-size: 0.9em;">Employee ID</label>
+          <input type="text" id="profileEmployeeId" disabled style="width: 100%; padding: 10px; background: #f3f4f6; border: 2px solid #e5e7eb; border-radius: 8px; color: #6b7280; font-size: 1em;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937; font-size: 0.9em;">Username</label>
+          <input type="text" id="profileUsername" disabled style="width: 100%; padding: 10px; background: #f3f4f6; border: 2px solid #e5e7eb; border-radius: 8px; color: #6b7280; font-size: 1em;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeProfileModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProfile()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">⚙️ Settings</h2>
+        <button class="modal-close" onclick="closeSettingsModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <h3 style="font-size: 1em; font-weight: 600; color: #1f2937; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb;">Change Password</h3>
+        
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937; font-size: 0.9em;">Current Password</label>
+          <input type="password" id="currentPassword" placeholder="Enter current password" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937; font-size: 0.9em;">New Password</label>
+          <input type="password" id="newPassword" placeholder="Enter new password" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+          <div style="font-size: 0.8em; color: #6b7280; margin-top: 4px;">Must be at least 6 characters</div>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937; font-size: 0.9em;">Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Confirm new password" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+        </div>
+        
+        <button class="btn btn-primary" onclick="changePassword()" style="width: 100%;">
+          🔒 Change Password
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const employeeId = urlParams.get('id');
@@ -444,6 +668,10 @@
         setInterval(updateClock, 1000);
         setInterval(loadStatus, 5000);
         setInterval(loadSchedule, 2000);
+        setInterval(loadDetectionStatus, 5000);
+        
+        // Check account status every 5 seconds for immediate detection
+        setInterval(checkAccountStatus, 5000);
         
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('clock') === 'true') {
@@ -465,14 +693,56 @@
 
     async function loadEmployeeData() {
       try {
-        const response = await fetch(`${API_URL}/employees`);
+        const response = await fetch(`${API_URL}/employees?include_inactive=true`);
         const employees = await response.json();
         const employee = employees.find(e => e.employee_id === employeeId);
         
-        if (employee) {
-          document.getElementById('employeeName').textContent = employee.name;
-          document.getElementById('employeeId').textContent = `ID: ${employee.employee_id}`;
+        // Check if employee account exists
+        if (!employee) {
+          // Account has been deleted
+          document.getElementById('loading').innerHTML = `
+            <div style="background: white; padding: 30px; border-radius: 16px; text-align: center; max-width: 400px; margin: 0 auto;">
+              <div style="font-size: 4em; margin-bottom: 20px;">🚫</div>
+              <h2 style="color: #dc2626; margin-bottom: 15px; font-size: 1.5em;">Account Deleted</h2>
+              <p style="color: #6b7280; margin-bottom: 25px; line-height: 1.6;">
+                Your employee account has been removed by an administrator. 
+                You no longer have access to this system.
+              </p>
+              <p style="color: #6b7280; font-size: 0.9em; margin-bottom: 25px;">
+                Please contact your HR department or administrator for more information.
+              </p>
+              <button onclick="clearAuthAndRedirect()" style="padding: 12px 24px; background: #dc2626; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1em;">
+                Return to Login
+              </button>
+            </div>
+          `;
+          return;
         }
+        
+        // Check if employee account is deactivated
+        if (employee.active === 0) {
+          document.getElementById('loading').innerHTML = `
+            <div style="background: white; padding: 30px; border-radius: 16px; text-align: center; max-width: 400px; margin: 0 auto;">
+              <div style="font-size: 4em; margin-bottom: 20px;">⚠️</div>
+              <h2 style="color: #f59e0b; margin-bottom: 15px; font-size: 1.5em;">Account Deactivated</h2>
+              <p style="color: #6b7280; margin-bottom: 25px; line-height: 1.6;">
+                Your employee account has been deactivated by an administrator. 
+                You cannot clock in or access attendance features.
+              </p>
+              <p style="color: #6b7280; font-size: 0.9em; margin-bottom: 25px;">
+                Please contact your HR department or administrator to reactivate your account.
+              </p>
+              <button onclick="clearAuthAndRedirect()" style="padding: 12px 24px; background: #f59e0b; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 1em;">
+                Return to Login
+              </button>
+            </div>
+          `;
+          return;
+        }
+        
+        // Account is active, proceed normally
+        document.getElementById('employeeName').textContent = employee.name;
+        document.getElementById('employeeId').textContent = `ID: ${employee.employee_id}`;
 
         await loadSchedule();
         await loadStatus();
@@ -481,6 +751,32 @@
         document.getElementById('content').style.display = 'block';
       } catch (error) {
         document.getElementById('loading').innerHTML = 'Error loading data<br><small>' + error.message + '</small>';
+      }
+    }
+    
+    function clearAuthAndRedirect() {
+      const authKey = 'auth_' + employeeId;
+      localStorage.removeItem(authKey);
+      window.location.href = 'employee-login.html';
+    }
+    
+    async function checkAccountStatus() {
+      try {
+        const response = await fetch(`${API_URL}/employees?include_inactive=true`);
+        const employees = await response.json();
+        const employee = employees.find(e => e.employee_id === employeeId);
+        
+        if (!employee) {
+          // Account has been deleted
+          alert('Your account has been deleted by an administrator. You will be logged out.');
+          clearAuthAndRedirect();
+        } else if (employee.active === 0) {
+          // Account has been deactivated
+          alert('Your account has been deactivated by an administrator. You will be logged out.');
+          clearAuthAndRedirect();
+        }
+      } catch (error) {
+        console.error('Error checking account status:', error);
       }
     }
 
@@ -553,17 +849,34 @@
     async function loadDetectionStatus() {
       try {
         const today = new Date();
-        const dateStr = today.toISOString().split('T')[0];
+        // Use local date instead of UTC to avoid timezone issues
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+        
         const url = `${API_URL}/attendance-status/${employeeId}?start_date=${dateStr}&end_date=${dateStr}`;
         
-        console.log('Loading detection status from:', url);
+        console.log('=== Loading Detection Status ===');
+        console.log('URL:', url);
         console.log('Employee ID:', employeeId);
-        console.log('Date:', dateStr);
+        console.log('Local Date:', dateStr);
+        console.log('UTC Date (for comparison):', today.toISOString().split('T')[0]);
         
         const response = await fetch(url);
+        console.log('Response status:', response.status);
+        
+        if (!response.ok) {
+          console.error('Response not OK:', response.status, response.statusText);
+          const errorText = await response.text();
+          console.error('Error response:', errorText);
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         const data = await response.json();
         
-        console.log('Detection data:', data);
+        console.log('Detection data received:', data);
+        console.log('Records:', data.records);
         console.log('Records count:', data.records ? data.records.length : 0);
         
         if (data.records && data.records.length > 0) {
@@ -636,17 +949,19 @@
           document.getElementById('detectionContent').style.display = 'block';
           document.getElementById('noDataMessage').style.display = 'none';
           
-          console.log('Detection card displayed');
+          console.log('✅ Detection card displayed successfully');
         } else {
-          console.log('No records found for today');
+          console.log('⚠️ No records found for today');
           document.getElementById('detectionContent').style.display = 'none';
           document.getElementById('noDataMessage').style.display = 'block';
         }
       } catch (error) {
-        console.error('Error loading detection status:', error);
+        console.error('❌ Error loading detection status:', error);
+        console.error('Error stack:', error.stack);
         document.getElementById('detectionContent').style.display = 'none';
         document.getElementById('noDataMessage').style.display = 'block';
       }
+      console.log('=== Detection Status Load Complete ===');
     }
 
     async function clockIn() {
@@ -702,6 +1017,131 @@
       }
     }
 
+    function toggleMenu() {
+      const dropdown = document.getElementById('menuDropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    function openProfileModal() {
+      toggleMenu();
+      
+      // Get employee data from page
+      const name = document.getElementById('employeeName').textContent;
+      const empId = document.getElementById('employeeId').textContent.replace('ID: ', '');
+      
+      // Set avatar initial
+      const initial = name.charAt(0).toUpperCase();
+      document.getElementById('profileAvatar').textContent = initial;
+      
+      // Set profile information
+      document.getElementById('profileNameDisplay').textContent = name;
+      document.getElementById('profileIdDisplay').textContent = empId;
+      document.getElementById('profileName').value = name;
+      document.getElementById('profileEmployeeId').value = empId;
+      
+      // Get username from localStorage or session
+      const authKey = 'auth_' + employeeId;
+      const authData = localStorage.getItem(authKey);
+      if (authData) {
+        const data = JSON.parse(authData);
+        document.getElementById('profileUsername').value = data.username || '';
+      }
+      
+      document.getElementById('profileModal').style.display = 'flex';
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').style.display = 'none';
+    }
+
+    async function saveProfile() {
+      const newName = document.getElementById('profileName').value.trim();
+      
+      if (!newName) {
+        alert('Name cannot be empty');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/employees/${employeeId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newName })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Update UI
+          document.getElementById('employeeName').textContent = newName;
+          alert('Profile updated successfully');
+          closeProfileModal();
+        } else {
+          alert(data.error || 'Failed to update profile');
+        }
+      } catch (error) {
+        console.error('Update profile error:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+
+    function openSettingsModal() {
+      toggleMenu();
+      document.getElementById('settingsModal').style.display = 'flex';
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').style.display = 'none';
+      // Clear password fields
+      document.getElementById('currentPassword').value = '';
+      document.getElementById('newPassword').value = '';
+      document.getElementById('confirmPassword').value = '';
+    }
+
+    async function changePassword() {
+      const currentPassword = document.getElementById('currentPassword').value.trim();
+      const newPassword = document.getElementById('newPassword').value.trim();
+      const confirmPassword = document.getElementById('confirmPassword').value.trim();
+      
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        alert('Please fill in all password fields');
+        return;
+      }
+      
+      if (newPassword.length < 6) {
+        alert('New password must be at least 6 characters long');
+        return;
+      }
+      
+      if (newPassword !== confirmPassword) {
+        alert('New passwords do not match');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/employees/${employeeId}/change-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            old_password: currentPassword,
+            new_password: newPassword 
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert('Password changed successfully');
+          closeSettingsModal();
+        } else {
+          alert(data.error || 'Failed to change password');
+        }
+      } catch (error) {
+        console.error('Change password error:', error);
+        alert('Error: ' + error.message);
+      }
+    }
+
     function logout() {
       if (confirm('Are you sure you want to logout? You will need to login again to use this QR code.')) {
         const authKey = 'auth_' + employeeId;
@@ -709,6 +1149,16 @@
         window.location.href = `employee-login.html?id=${employeeId}`;
       }
     }
+
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+      const menuButton = event.target.closest('.menu-button');
+      const menuDropdown = document.getElementById('menuDropdown');
+      
+      if (!menuButton && !event.target.closest('.menu-dropdown')) {
+        menuDropdown.classList.remove('show');
+      }
+    });
 
     function openQRScanner() {
       window.location.href = 'qr-scanner.html';
