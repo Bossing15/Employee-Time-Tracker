@@ -150,7 +150,6 @@
               <button id="adminWhMonthlyBtn" class="btn btn-secondary btn-sm">Monthly</button>
             </div>
           </div>
-          <div id="adminWhDateRange" style="margin-top: 8px; margin-bottom: 8px; font-size: 0.95em; color: #6b7280; font-weight: 500;"></div>
           <div id="adminWhControls" style="margin-top: 12px;"></div>
           <div class="stats-grid" style="margin-top: 12px;">
             <div class="stat-card">
@@ -703,28 +702,33 @@
       start.setDate(start.getDate() - 6);
       const startStr = start.toISOString().split('T')[0];
       const endStr = now.toISOString().split('T')[0];
-      const dateRangeFormatted = formatDateRange(startStr, endStr);
+      const startFormatted = formatLongDate(startStr);
+      const endFormatted = formatLongDate(endStr);
       document.getElementById('adminWhControls').innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
+        <div style="display: grid; grid-template-columns: 1fr auto 1fr auto; gap: 8px; align-items: center;">
           <div style="position: relative;">
-            <input type="date" id="adminWhWeekStart" value="${startStr}" class="input" style="opacity: 0; position: absolute; pointer-events: none; width: 1px;">
-            <input type="date" id="adminWhWeekEnd" value="${endStr}" class="input" style="opacity: 0; position: absolute; pointer-events: none; width: 1px;">
+            <input type="date" id="adminWhWeekStart" value="${startStr}" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
             <div onclick="document.getElementById('adminWhWeekStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;">
-              ${dateRangeFormatted}
+              ${startFormatted}
+            </div>
+          </div>
+          <div style="text-align: center; font-weight: 500; color: #6b7280;">-</div>
+          <div style="position: relative;">
+            <input type="date" id="adminWhWeekEnd" value="${endStr}" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+            <div onclick="document.getElementById('adminWhWeekEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;">
+              ${endFormatted}
             </div>
           </div>
           <button id="adminWhWeeklyLoad" class="btn btn-primary">Load</button>
         </div>
       `;
       document.getElementById('adminWhWeekStart').addEventListener('change', function() {
-        const startVal = this.value;
-        const endVal = document.getElementById('adminWhWeekEnd').value;
-        this.parentElement.querySelector('div').textContent = formatDateRange(startVal, endVal);
+        const selected = this.value;
+        this.nextElementSibling.textContent = formatLongDate(selected);
       });
       document.getElementById('adminWhWeekEnd').addEventListener('change', function() {
-        const startVal = document.getElementById('adminWhWeekStart').value;
-        const endVal = this.value;
-        this.parentElement.querySelector('div').textContent = formatDateRange(startVal, endVal);
+        const selected = this.value;
+        this.nextElementSibling.textContent = formatLongDate(selected);
       });
       document.getElementById('adminWhWeeklyLoad').onclick = loadAdminWorkHoursWeekly;
     }
@@ -799,9 +803,6 @@
       const url = `${API_URL}/work-hours/summary?start_date=${startDate}&end_date=${endDate}&period_type=${periodType}`;
       const res = await fetch(url);
       const data = await res.json();
-      
-      // Display date range
-      document.getElementById('adminWhDateRange').textContent = formatDateRange(startDate, endDate);
       
       document.getElementById('adminWhEmployeeCount').textContent = data.total_employees || 0;
       const totals = data.employees ? data.employees.reduce((acc, e) => {
