@@ -678,12 +678,22 @@
 
     function renderAdminWHDailyControls() {
       const today = new Date().toISOString().split('T')[0];
+      const todayFormatted = formatLongDate(today);
       document.getElementById('adminWhControls').innerHTML = `
         <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
-          <input type="date" id="adminWhDailyDate" value="${today}" class="input">
+          <div style="position: relative;">
+            <input type="date" id="adminWhDailyDate" value="${today}" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+            <div onclick="document.getElementById('adminWhDailyDate').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;">
+              ${todayFormatted}
+            </div>
+          </div>
           <button id="adminWhDailyLoad" class="btn btn-primary">Load</button>
         </div>
       `;
+      document.getElementById('adminWhDailyDate').addEventListener('change', function() {
+        const selected = this.value;
+        this.nextElementSibling.textContent = formatLongDate(selected);
+      });
       document.getElementById('adminWhDailyLoad').onclick = loadAdminWorkHoursDaily;
     }
 
@@ -693,25 +703,61 @@
       start.setDate(start.getDate() - 6);
       const startStr = start.toISOString().split('T')[0];
       const endStr = now.toISOString().split('T')[0];
+      const dateRangeFormatted = formatDateRange(startStr, endStr);
       document.getElementById('adminWhControls').innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px;">
-          <input type="date" id="adminWhWeekStart" value="${startStr}" class="input">
-          <input type="date" id="adminWhWeekEnd" value="${endStr}" class="input">
+        <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
+          <div style="position: relative;">
+            <input type="date" id="adminWhWeekStart" value="${startStr}" class="input" style="opacity: 0; position: absolute; pointer-events: none; width: 1px;">
+            <input type="date" id="adminWhWeekEnd" value="${endStr}" class="input" style="opacity: 0; position: absolute; pointer-events: none; width: 1px;">
+            <div onclick="document.getElementById('adminWhWeekStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;">
+              ${dateRangeFormatted}
+            </div>
+          </div>
           <button id="adminWhWeeklyLoad" class="btn btn-primary">Load</button>
         </div>
       `;
+      document.getElementById('adminWhWeekStart').addEventListener('change', function() {
+        const startVal = this.value;
+        const endVal = document.getElementById('adminWhWeekEnd').value;
+        this.parentElement.querySelector('div').textContent = formatDateRange(startVal, endVal);
+      });
+      document.getElementById('adminWhWeekEnd').addEventListener('change', function() {
+        const startVal = document.getElementById('adminWhWeekStart').value;
+        const endVal = this.value;
+        this.parentElement.querySelector('div').textContent = formatDateRange(startVal, endVal);
+      });
       document.getElementById('adminWhWeeklyLoad').onclick = loadAdminWorkHoursWeekly;
     }
 
     function renderAdminWHMonthlyControls() {
       const d = new Date();
       const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+      const year = d.getFullYear();
+      const month = d.getMonth() + 1;
+      const startDate = `${year}-${String(month).padStart(2,'0')}-01`;
+      const lastDay = new Date(year, month, 0);
+      const endDate = lastDay.toISOString().split('T')[0];
+      const monthRangeFormatted = formatDateRange(startDate, endDate);
       document.getElementById('adminWhControls').innerHTML = `
         <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
-          <input type="month" id="adminWhMonth" value="${ym}" class="input">
+          <div style="position: relative;">
+            <input type="month" id="adminWhMonth" value="${ym}" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+            <div onclick="document.getElementById('adminWhMonth').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;">
+              ${monthRangeFormatted}
+            </div>
+          </div>
           <button id="adminWhMonthlyLoad" class="btn btn-primary">Load</button>
         </div>
       `;
+      document.getElementById('adminWhMonth').addEventListener('change', function() {
+        const [y, m] = this.value.split('-');
+        const yr = parseInt(y);
+        const mo = parseInt(m);
+        const start = `${yr}-${String(mo).padStart(2,'0')}-01`;
+        const last = new Date(yr, mo, 0);
+        const end = last.toISOString().split('T')[0];
+        this.nextElementSibling.textContent = formatDateRange(start, end);
+      });
       document.getElementById('adminWhMonthlyLoad').onclick = loadAdminWorkHoursMonthly;
     }
 
