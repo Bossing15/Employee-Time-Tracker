@@ -191,6 +191,95 @@
 
       <!-- Reports Section -->
       <div id="reports-section" class="content-section" style="display: none;">
+        <!-- 0. Individual Employee Report -->
+        <div class="card">
+          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 class="card-title">👤 Individual Employee Report</h2>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 16px;">
+            <select id="empReportSelect" class="input" style="padding: 10px;">
+              <option value="">Select Employee...</option>
+            </select>
+            <input type="date" id="empReportStart" class="input">
+            <input type="date" id="empReportEnd" class="input">
+            <button class="btn btn-primary" onclick="loadEmployeeReport()">Generate Report</button>
+          </div>
+          
+          <div id="empReportContent" style="display: none;">
+            <!-- Employee Info -->
+            <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #e5e7eb;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                <div>
+                  <div style="font-size: 0.85em; color: #6b7280; margin-bottom: 4px;">Employee Name</div>
+                  <div style="font-size: 1.1em; font-weight: 600; color: #1f2937;" id="empReportName">-</div>
+                </div>
+                <div>
+                  <div style="font-size: 0.85em; color: #6b7280; margin-bottom: 4px;">Employee ID</div>
+                  <div style="font-size: 1.1em; font-weight: 600; color: #1f2937;" id="empReportId">-</div>
+                </div>
+              </div>
+              <div style="margin-top: 12px;">
+                <div style="font-size: 0.85em; color: #6b7280; margin-bottom: 4px;">Report Period</div>
+                <div style="font-size: 1em; font-weight: 600; color: #1f2937;" id="empReportPeriod">-</div>
+              </div>
+            </div>
+
+            <!-- Summary Stats -->
+            <div class="stats-grid" style="margin-bottom: 16px;">
+              <div class="stat-card">
+                <div class="stat-label">Days Worked</div>
+                <div class="stat-value" id="empReportDays">0</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Total Hours</div>
+                <div class="stat-value" id="empReportHours">0h</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Expected Hours</div>
+                <div class="stat-value" id="empReportExpected">0h</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Variance</div>
+                <div class="stat-value" id="empReportVariance">0h</div>
+              </div>
+            </div>
+
+            <!-- Attendance Breakdown -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+              <div style="background: #fee2e2; padding: 12px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 0.8em; color: #991b1b; font-weight: 600; margin-bottom: 4px;">Late</div>
+                <div style="font-size: 1.8em; color: #dc2626; font-weight: 700;" id="empReportLate">0</div>
+              </div>
+              <div style="background: #fef3c7; padding: 12px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 0.8em; color: #92400e; font-weight: 600; margin-bottom: 4px;">Undertime</div>
+                <div style="font-size: 1.8em; color: #d97706; font-weight: 700;" id="empReportUndertime">0</div>
+              </div>
+              <div style="background: #d1fae5; padding: 12px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 0.8em; color: #065f46; font-weight: 600; margin-bottom: 4px;">Overtime</div>
+                <div style="font-size: 1.8em; color: #059669; font-weight: 700;" id="empReportOvertime">0</div>
+              </div>
+              <div style="background: #dbeafe; padding: 12px; border-radius: 8px; text-align: center;">
+                <div style="font-size: 0.8em; color: #1e40af; font-weight: 600; margin-bottom: 4px;">Incomplete</div>
+                <div style="font-size: 1.8em; color: #2563eb; font-weight: 700;" id="empReportIncomplete">0</div>
+              </div>
+            </div>
+
+            <!-- Detailed Records Table -->
+            <div style="margin-top: 16px;">
+              <h3 style="font-size: 1em; font-weight: 600; color: #1f2937; margin-bottom: 12px;">Detailed Attendance Records</h3>
+              <div id="empReportTable" style="overflow-x: auto;"></div>
+            </div>
+
+            <!-- Export Button -->
+            <div style="margin-top: 16px; text-align: right;">
+              <button class="btn btn-secondary" onclick="exportEmployeeReport()">
+                <span>📄</span>
+                Export Report
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- 1. Attendance Summary -->
         <div class="card">
           <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
@@ -853,14 +942,30 @@
       loadAdminWorkHoursWeekly();
     }
 
-    function initReportsDefaults() {
+    async function initReportsDefaults() {
       const today = new Date();
       const lastWeek = new Date(today);
       lastWeek.setDate(today.getDate() - 7);
       const tStr = today.toISOString().split('T')[0];
       const wStr = lastWeek.toISOString().split('T')[0];
-      ['attSumStart','paySumStart','errStart','breakSumStart'].forEach(id => { const el = document.getElementById(id); if (el && !el.value) el.value = wStr; });
-      ['attSumEnd','paySumEnd','errEnd','breakSumEnd'].forEach(id => { const el = document.getElementById(id); if (el && !el.value) el.value = tStr; });
+      ['attSumStart','paySumStart','errStart','breakSumStart','empReportStart'].forEach(id => { const el = document.getElementById(id); if (el && !el.value) el.value = wStr; });
+      ['attSumEnd','paySumEnd','errEnd','breakSumEnd','empReportEnd'].forEach(id => { const el = document.getElementById(id); if (el && !el.value) el.value = tStr; });
+      
+      // Populate employee dropdown for individual report
+      try {
+        const response = await fetch(`${API_URL}/employees`);
+        const employees = await response.json();
+        const select = document.getElementById('empReportSelect');
+        select.innerHTML = '<option value="">Select Employee...</option>';
+        employees.forEach(emp => {
+          const option = document.createElement('option');
+          option.value = emp.employee_id;
+          option.textContent = `${emp.name} (${emp.employee_id})`;
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Error loading employees for report:', error);
+      }
     }
 
     async function loadBreakSummary() {
@@ -955,6 +1060,145 @@
       const thead = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>`;
       const tbody = `<tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
       container.innerHTML = `<table>${thead}${tbody}</table>`;
+    }
+
+    // ============================================
+    // INDIVIDUAL EMPLOYEE REPORT
+    // ============================================
+
+    async function loadEmployeeReport() {
+      const empId = document.getElementById('empReportSelect').value;
+      const startDate = document.getElementById('empReportStart').value;
+      const endDate = document.getElementById('empReportEnd').value;
+
+      if (!empId) {
+        alert('Please select an employee');
+        return;
+      }
+      if (!startDate || !endDate) {
+        alert('Please select start and end dates');
+        return;
+      }
+
+      try {
+        // Fetch employee details
+        const empResponse = await fetch(`${API_URL}/employees`);
+        const employees = await empResponse.json();
+        const employee = employees.find(e => e.employee_id === empId);
+
+        if (!employee) {
+          alert('Employee not found');
+          return;
+        }
+
+        // Fetch attendance status for the period
+        const response = await fetch(`${API_URL}/attendance-status/${empId}?start_date=${startDate}&end_date=${endDate}`);
+        const data = await response.json();
+
+        // Display employee info
+        document.getElementById('empReportName').textContent = employee.name;
+        document.getElementById('empReportId').textContent = employee.employee_id;
+        document.getElementById('empReportPeriod').textContent = formatDateRange(startDate, endDate);
+
+        // Calculate summary
+        const summary = data.summary || {};
+        const records = data.records || [];
+        
+        const totalHours = records.reduce((sum, r) => sum + (r.hoursWorked || 0), 0);
+        const daysWorked = new Set(records.map(r => r.clock_in.split(' ')[0])).size;
+        
+        // Calculate expected hours
+        const schedule = data.schedule || {};
+        const expectedHoursPerDay = schedule.expectedHours || 8;
+        const startDateObj = new Date(startDate);
+        const endDateObj = new Date(endDate);
+        let expectedWorkDays = 0;
+        for (let d = new Date(startDateObj); d <= endDateObj; d.setDate(d.getDate() + 1)) {
+          const dayOfWeek = d.getDay();
+          if (dayOfWeek !== 0 && dayOfWeek !== 6) expectedWorkDays++;
+        }
+        const expectedTotalHours = expectedWorkDays * expectedHoursPerDay;
+        const variance = totalHours - expectedTotalHours;
+
+        // Update summary stats
+        document.getElementById('empReportDays').textContent = daysWorked;
+        document.getElementById('empReportHours').textContent = totalHours.toFixed(1) + 'h';
+        document.getElementById('empReportExpected').textContent = expectedTotalHours.toFixed(1) + 'h';
+        document.getElementById('empReportVariance').textContent = (variance >= 0 ? '+' : '') + variance.toFixed(1) + 'h';
+        
+        // Color code variance
+        const varianceEl = document.getElementById('empReportVariance');
+        if (variance > 0) {
+          varianceEl.style.color = '#059669';
+        } else if (variance < 0) {
+          varianceEl.style.color = '#dc2626';
+        } else {
+          varianceEl.style.color = '#6b7280';
+        }
+
+        // Update breakdown
+        document.getElementById('empReportLate').textContent = summary.late_count || 0;
+        document.getElementById('empReportUndertime').textContent = summary.undertime_count || 0;
+        document.getElementById('empReportOvertime').textContent = summary.overtime_count || 0;
+        document.getElementById('empReportIncomplete').textContent = records.filter(r => !r.clock_out).length;
+
+        // Build detailed table
+        const tableRows = records.map(record => {
+          const date = new Date(record.clock_in).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          const clockIn = new Date(record.clock_in).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+          const clockOut = record.clock_out ? new Date(record.clock_out).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : '-';
+          const hours = record.hoursWorked ? record.hoursWorked.toFixed(2) + 'h' : '-';
+          
+          let status = [];
+          if (record.isLate) status.push(`<span style="color: #dc2626;">Late ${record.lateMinutes}m</span>`);
+          if (record.isUndertime) status.push(`<span style="color: #d97706;">Undertime ${record.undertimeHours}h</span>`);
+          if (record.isOvertime) status.push(`<span style="color: #059669;">Overtime ${record.overtimeHours}h</span>`);
+          if (!record.clock_out) status.push(`<span style="color: #2563eb;">Incomplete</span>`);
+          if (status.length === 0) status.push(`<span style="color: #6b7280;">Normal</span>`);
+          
+          return [date, clockIn, clockOut, hours, status.join(', ')];
+        });
+
+        const tableHtml = `
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Clock In</th>
+                <th>Clock Out</th>
+                <th>Hours</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows.map(row => `
+                <tr>
+                  <td>${row[0]}</td>
+                  <td>${row[1]}</td>
+                  <td>${row[2]}</td>
+                  <td>${row[3]}</td>
+                  <td>${row[4]}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+
+        document.getElementById('empReportTable').innerHTML = tableHtml;
+        document.getElementById('empReportContent').style.display = 'block';
+
+      } catch (error) {
+        console.error('Error loading employee report:', error);
+        alert('Error loading report: ' + error.message);
+      }
+    }
+
+    function exportEmployeeReport() {
+      const empName = document.getElementById('empReportName').textContent;
+      const empId = document.getElementById('empReportId').textContent;
+      const period = document.getElementById('empReportPeriod').textContent;
+      
+      alert(`Export functionality for ${empName} (${empId})\nPeriod: ${period}\n\nThis would generate a PDF or CSV file with the complete report.`);
     }
 
     async function loadAttendanceSummary() {
