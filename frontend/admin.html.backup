@@ -35,18 +35,19 @@
               <span>Employees</span>
             </a>
           </li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section" style="margin-top: auto; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+        <ul class="sidebar-menu">
           <li class="sidebar-menu-item">
-            <a href="#" class="sidebar-menu-link" onclick="showSection('reports'); return false;">
-              <span class="sidebar-menu-icon">📑</span>
-              <span>Reports</span>
+            <a href="#" class="sidebar-menu-link" onclick="showSection('settings'); return false;">
+              <span class="sidebar-menu-icon">⚙️</span>
+              <span>Settings</span>
             </a>
           </li>
         </ul>
       </div>
-
-
-
-
     </aside>
 
     <!-- Main Content -->
@@ -106,7 +107,9 @@
         <!-- QR Code Card -->
         <div class="qr-card">
           <div class="qr-card-content">
-            <div class="qr-card-icon">📷</div>
+            <div class="qr-card-icon">
+              <img src="Images/qr (1).png" alt="QR Code" style="width: 48px; height: 48px;">
+            </div>
             <div class="qr-card-text">
               <h3 class="qr-card-title">Attendance QR Code</h3>
               <p class="qr-card-description">Display this QR code at your workplace entrance for employees to scan and clock in/out</p>
@@ -130,44 +133,9 @@
             <div class="stat-value" id="clockedInNow">0</div>
           </div>
           <div class="stat-card">
-            <div class="stat-label">On Break Now</div>
-            <div class="stat-value" id="onBreakNow">0</div>
-          </div>
-          <div class="stat-card">
             <div class="stat-label">This Week Hours</div>
             <div class="stat-value" id="weekTotalHours">0h</div>
           </div>
-        </div>
-
-        <div class="card" style="margin-top: 16px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4); padding-bottom: 12px; border-bottom: 1px solid var(--neutral-200);">
-            <div class="card-title" style="margin-bottom: 0;">⏰ Work Hours Summary</div>
-            <div style="display: flex; gap: var(--space-2);">
-              <button id="adminWhDailyBtn" class="btn btn-secondary btn-sm">Daily</button>
-              <button id="adminWhWeeklyBtn" class="btn btn-secondary btn-sm">Weekly</button>
-              <button id="adminWhMonthlyBtn" class="btn btn-secondary btn-sm">Monthly</button>
-            </div>
-          </div>
-          <div id="adminWhControls" style="margin-top: 12px;"></div>
-          <div class="stats-grid" style="margin-top: 12px;">
-            <div class="stat-card">
-              <div class="stat-label">Employees</div>
-              <div class="stat-value" id="adminWhEmployeeCount">0</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Total Hours</div>
-              <div class="stat-value" id="adminWhTotalHours">0h</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Expected Hours</div>
-              <div class="stat-value" id="adminWhExpectedHours">0h</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Incomplete Records</div>
-              <div class="stat-value" id="adminWhIncomplete">0</div>
-            </div>
-          </div>
-          <div id="adminWhTable" style="margin-top: 12px; overflow-x: auto;"></div>
         </div>
       </div>
 
@@ -187,83 +155,58 @@
         </div>
       </div>
 
-      <!-- Reports Section -->
-      <div id="reports-section" class="content-section" style="display: none;">
-        <!-- 1. Attendance Summary -->
+      <!-- Settings Section -->
+      <div id="settings-section" class="content-section" style="display: none;">
         <div class="card">
-          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 class="card-title">Attendance Summary</h2>
+          <div class="card-header">
+            <h2 class="card-title">⚙️ Account Settings</h2>
           </div>
-          <div class="grid-controls-3">
-            <input type="date" id="attSumStart" class="input">
-            <input type="date" id="attSumEnd" class="input">
-            <button class="btn btn-primary" onclick="loadAttendanceSummary()">Load</button>
-          </div>
-          <div class="stats-grid">
-            <div class="stat-card"><div class="stat-label">Records</div><div class="stat-value" id="attSumRecords">0</div></div>
-            <div class="stat-card"><div class="stat-label">Completed</div><div class="stat-value" id="attSumCompleted">0</div></div>
-            <div class="stat-card"><div class="stat-label">Incomplete</div><div class="stat-value" id="attSumIncomplete">0</div></div>
-            <div class="stat-card"><div class="stat-label">Total Hours</div><div class="stat-value" id="attSumHours">0h</div></div>
-          </div>
-          <div id="attSumTable" style="margin-top: 12px; overflow-x: auto;"></div>
-        </div>
-
-        <!-- 2. Break Time Summary -->
-        <div class="card" style="margin-top: 16px;">
-          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 class="card-title">Break Time Summary</h2>
-          </div>
-          <div class="grid-controls-3">
-            <input type="date" id="breakSumStart" class="input">
-            <input type="date" id="breakSumEnd" class="input">
-            <button class="btn btn-primary" onclick="loadBreakSummary()">Load</button>
-          </div>
-          <div class="stats-grid">
-            <div class="stat-card"><div class="stat-label">Total Breaks</div><div class="stat-value" id="breakSumTotal">0</div></div>
-            <div class="stat-card"><div class="stat-label">Total Break Time</div><div class="stat-value" id="breakSumTime">0h</div></div>
-            <div class="stat-card"><div class="stat-label">Avg Break Duration</div><div class="stat-value" id="breakSumAvg">0m</div></div>
-            <div class="stat-card"><div class="stat-label">Employees w/ No Breaks</div><div class="stat-value" id="breakSumNoBreaks">0</div></div>
-          </div>
-          <div id="breakSumTable" style="margin-top: 12px; overflow-x: auto;"></div>
-        </div>
-
-        <!-- 3. Errors & Missing Logs -->
-        <div class="card" style="margin-top: 16px;">
-          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 class="card-title">Errors & Missing Logs</h2>
-          </div>
-          <div class="grid-controls-3">
-            <input type="date" id="errStart" class="input">
-            <input type="date" id="errEnd" class="input">
-            <button class="btn btn-primary" onclick="loadErrorsMissing()">Load</button>
-          </div>
-          <div class="stats-grid">
-            <div class="stat-card"><div class="stat-label">Incomplete Records</div><div class="stat-value" id="errIncomplete">0</div></div>
-            <div class="stat-card"><div class="stat-label">Missing Days</div><div class="stat-value" id="errMissingDays">0</div></div>
-            <div class="stat-card"><div class="stat-label">Employees w/ Issues</div><div class="stat-value" id="errEmployees">0</div></div>
-          </div>
-          <div id="errTables" style="margin-top: 12px; display: grid; gap: 16px;">
-            <div>
-              <div id="errIncompleteTable" style="overflow-x: auto;"></div>
-            </div>
-            <div>
-              <div id="errMissingTable" style="overflow-x: auto;"></div>
+          
+          <!-- Account Information -->
+          <div style="margin-bottom: 30px;">
+            <h3 style="font-size: 1.1em; font-weight: 600; color: #1f2937; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e5e7eb;">Account Information</h3>
+            
+            <div style="background: #f9fafb; padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb; margin-bottom: 20px;">
+              <div style="display: grid; grid-template-columns: 120px 1fr; gap: 15px; font-size: 0.95em;">
+                <div style="color: #6b7280; font-weight: 500;">Name:</div>
+                <div style="color: #1f2937; font-weight: 600;" id="settingsAdminName">-</div>
+                
+                <div style="color: #6b7280; font-weight: 500;">Username:</div>
+                <div style="color: #1f2937; font-weight: 600;" id="settingsAdminUsername">-</div>
+                
+                <div style="color: #6b7280; font-weight: 500;">Role:</div>
+                <div style="color: #1f2937; font-weight: 600;">Administrator</div>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- 4. Payroll Attendance Summary -->
-        <div class="card" style="margin-top: 16px;">
-          <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 class="card-title">Payroll Attendance Summary</h2>
+          <!-- Change Password -->
+          <div>
+            <h3 style="font-size: 1.1em; font-weight: 600; color: #1f2937; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e5e7eb;">Change Password</h3>
+            
+            <div style="max-width: 500px;">
+              <div style="margin-bottom: 20px;">
+                <label for="currentPassword" style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">Current Password</label>
+                <input type="password" id="currentPassword" placeholder="Enter current password" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+              </div>
+              
+              <div style="margin-bottom: 20px;">
+                <label for="newPassword" style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">New Password</label>
+                <input type="password" id="newPassword" placeholder="Enter new password" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+                <div style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">Must be at least 6 characters long</div>
+              </div>
+              
+              <div style="margin-bottom: 20px;">
+                <label for="confirmPassword" style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">Confirm New Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm new password" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+              </div>
+              
+              <button class="btn btn-primary" onclick="changePassword()">
+                <span>🔒</span>
+                Change Password
+              </button>
+            </div>
           </div>
-          <div class="grid-controls-4-rate">
-            <input type="date" id="paySumStart" class="input">
-            <input type="date" id="paySumEnd" class="input">
-            <input type="number" id="payRate" class="input" placeholder="Rate per Hour" value="70" min="0" step="0.01">
-            <button class="btn btn-primary" onclick="loadPayrollSummary()">Load</button>
-          </div>
-          <div id="paySumTable" style="margin-top: 12px; overflow-x: auto;"></div>
         </div>
       </div>
 
@@ -277,7 +220,10 @@
     <div id="editEmployeeModal" class="modal" style="display: none;">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title">Edit Employee</h2>
+          <h2 class="modal-title">
+            <img src="Images/pen.png" alt="Edit" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 10px;">
+            Edit Employee
+          </h2>
           <button class="modal-close" onclick="closeEditEmployeeModal()">✕</button>
         </div>
         <div class="modal-body">
@@ -305,6 +251,46 @@
       </div>
     </div>
 
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">
+            👤 My Profile
+          </h2>
+          <button class="modal-close" onclick="closeProfileModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div style="text-align: center; margin-bottom: 30px;">
+            <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: inline-flex; align-items: center; justify-content: center; font-size: 2.5em; color: white; font-weight: bold; margin-bottom: 15px;" id="profileAvatar">A</div>
+            <div style="font-size: 1.2em; font-weight: 600; color: #1f2937;" id="profileNameDisplay">Admin</div>
+            <div style="font-size: 0.9em; color: #6b7280; margin-top: 5px;" id="profileUsernameDisplay">@admin</div>
+            <div style="display: inline-block; margin-top: 10px; padding: 4px 12px; background: #dbeafe; color: #1e40af; border-radius: 12px; font-size: 0.85em; font-weight: 600;">Administrator</div>
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <label for="profileName" style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">Full Name</label>
+            <input type="text" id="profileName" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+          </div>
+          
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">Username</label>
+            <input type="text" id="profileUsername" disabled style="width: 100%; padding: 10px; background: #f3f4f6; border: 2px solid #e5e7eb; border-radius: 8px; color: #6b7280; font-size: 1em;">
+            <div style="font-size: 0.85em; color: #6b7280; margin-top: 5px;">Username cannot be changed</div>
+          </div>
+          
+          <div style="background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb;">
+            <div style="font-size: 0.9em; color: #6b7280; margin-bottom: 8px;">Account Created</div>
+            <div style="font-weight: 600; color: #1f2937;" id="profileCreatedAt">-</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeProfileModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Notification Modal -->
     <div id="notificationModal" class="modal" style="display: none;">
       <div class="modal-content" style="max-width: 400px;">
@@ -318,23 +304,6 @@
         </div>
         <div class="modal-footer" style="justify-content: center;">
           <button class="btn btn-primary" onclick="closeNotificationModal()" id="notifOkBtn">OK</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Payroll Breakdown Modal -->
-    <div id="payrollBreakdownModal" class="modal" style="display: none;">
-      <div class="modal-content" style="max-width: 800px;">
-        <div class="modal-header">
-          <h2 class="modal-title">Payroll Breakdown</h2>
-          <button class="modal-close" onclick="closePayrollBreakdownModal()">✕</button>
-        </div>
-        <div class="modal-body">
-          <div id="payrollBreakdownHeader" style="margin-bottom: 12px; color: #374151;"></div>
-          <div id="payrollBreakdownTable" style="overflow-x: auto;"></div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary" onclick="closePayrollBreakdownModal()">Close</button>
         </div>
       </div>
     </div>
@@ -361,7 +330,10 @@
     <div id="scheduleModal" class="modal" style="display: none;">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title">Set Work Schedule</h2>
+          <h2 class="modal-title">
+            <img src="Images/alarm-clock.png" alt="Schedule" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 10px;">
+            Set Work Schedule
+          </h2>
           <button class="modal-close" onclick="closeScheduleModal()">✕</button>
         </div>
         <div class="modal-body">
@@ -393,6 +365,8 @@
               </div>
             </div>
           </div>
+          
+
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" onclick="closeScheduleModal()">Cancel</button>
@@ -425,8 +399,6 @@
       
       if (sectionName === 'employees') {
         loadEmployeeList();
-      } else if (sectionName === 'reports') {
-        initReportsDefaults();
       }
     }
 
@@ -454,7 +426,6 @@
     setTimeout(() => {
       loadEmployeeList();
       loadStats();
-      initAdminWorkHoursUI();
     }, 100);
 
     async function loadStats() {
@@ -468,23 +439,14 @@
         if (totalEmpEl) totalEmpEl.textContent = employees.length;
 
         let clockedIn = 0;
-        let onBreak = 0;
         for (const emp of employees) {
           const statusRes = await fetch(`${API_URL}/status/${emp.employee_id}`);
           const status = await statusRes.json();
           if (status.clocked_in) clockedIn++;
-          
-          // Check if employee is on break
-          const breakRes = await fetch(`${API_URL}/breaks/active/${emp.employee_id}`);
-          const breakData = await breakRes.json();
-          if (breakData.active_break) onBreak++;
         }
         console.log('Clocked in:', clockedIn);
-        console.log('On break:', onBreak);
         const clockedInEl = document.getElementById('clockedInNow');
         if (clockedInEl) clockedInEl.textContent = clockedIn;
-        const onBreakEl = document.getElementById('onBreakNow');
-        if (onBreakEl) onBreakEl.textContent = onBreak;
 
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
@@ -524,7 +486,6 @@
                 <th>Username</th>
                 <th>Registered</th>
                 <th style="text-align: center;">In/Out</th>
-                <th style="text-align: center;">Break Status</th>
                 <th style="text-align: center;">Actions</th>
               </tr>
             </thead>
@@ -540,24 +501,15 @@
                       <span class="status-badge" data-employee-id="${emp.employee_id}" style="font-size: 0.8em; padding: 4px 8px;">-</span>
                     </td>
                     <td style="text-align: center;">
-                      <span class="break-status-badge-admin" data-break-employee-id="${emp.employee_id}" style="font-size: 0.75em; padding: 4px 10px; border-radius: 12px; display: inline-block; background: #f3f4f6; color: #6b7280;">-</span>
-                    </td>
-                    <td style="text-align: center;">
                       <button class="action-btn action-btn-info" onclick="openEditEmployeeModal('${emp.employee_id}', '${emp.name.replace(/'/g, "\\'")}', '${emp.username}')" title="Edit Employee">
-                        <span>✏️</span>
+                        <img src="Images/pen.png" alt="Edit" style="width: 18px; height: 18px;">
                       </button>
                       <button class="action-btn action-btn-info schedule-btn" data-employee-id="${emp.employee_id}" data-employee-name="${emp.name}" title="Set Work Schedule">
-                        <span>⏰</span>
-                      </button>
-                      <button class="action-btn" onclick="adminClockIn('${emp.employee_id}')" title="Clock In">
-                        <span>🟢</span>
-                      </button>
-                      <button class="action-btn" onclick="adminClockOut('${emp.employee_id}')" title="Clock Out">
-                        <span>🔴</span>
+                        <img src="Images/alarm-clock.png" alt="Schedule" style="width: 18px; height: 18px;">
                       </button>
                       ${emp.active === 1 ? `
                         <button class="action-btn action-btn-danger" onclick="deleteEmployee('${emp.employee_id}', '${emp.name.replace(/'/g, "\\'")}')" title="Delete Employee">
-                          <span>🗑️</span>
+                          <img src="Images/delete.png" alt="Delete" style="width: 18px; height: 18px;">
                         </button>
                       ` : ''}
                     </td>
@@ -585,7 +537,6 @@
         // Load today's status for each employee
         employees.forEach(emp => {
           loadEmployeeStatus(emp.employee_id);
-          loadEmployeeBreakStatus(emp.employee_id);
         });
       } catch (error) {
         console.error('Error loading employee list:', error);
@@ -594,403 +545,15 @@
       }
     }
 
-    async function loadEmployeeBreakStatus(employeeId) {
-      try {
-        const response = await fetch(`${API_URL}/breaks/active/${employeeId}`);
-        const data = await response.json();
-        
-        const breakBadge = document.querySelector(`[data-break-employee-id="${employeeId}"]`);
-        if (!breakBadge) return;
-        
-        if (data.active_break) {
-          const breakType = data.active_break.break_type;
-          const startTime = new Date(data.active_break.start_time);
-          const now = new Date();
-          const elapsedMinutes = Math.floor((now - startTime) / 60000);
-          
-          // Get break type icon
-          const breakIcons = {
-            'Breakfast': '🍳',
-            'Lunch': '🍽️',
-            'Coffee Break': '☕',
-            'Personal': '🚻',
-            'Other': '📝',
-            'Break': '⏸️'
-          };
-          const icon = breakIcons[breakType] || '⏸️';
-          
-          // Color code by duration
-          let bgColor = '#fef3c7'; // yellow for normal
-          let textColor = '#92400e';
-          if (elapsedMinutes > 45) {
-            bgColor = '#fee2e2'; // red for long
-            textColor = '#991b1b';
-          } else if (elapsedMinutes <= 15) {
-            bgColor = '#d1fae5'; // green for short
-            textColor = '#065f46';
-          }
-          
-          breakBadge.textContent = `${icon} ${breakType} (${elapsedMinutes}m)`;
-          breakBadge.style.background = bgColor;
-          breakBadge.style.color = textColor;
-          breakBadge.style.fontWeight = '600';
-        } else {
-          breakBadge.textContent = '-';
-          breakBadge.style.background = '#f3f4f6';
-          breakBadge.style.color = '#6b7280';
-          breakBadge.style.fontWeight = 'normal';
-        }
-      } catch (error) {
-        console.error('Error loading employee break status:', error);
-      }
-    }
-
-    function setAdminWhActive(btnId) {
-      ['adminWhDailyBtn','adminWhWeeklyBtn','adminWhMonthlyBtn'].forEach(id => {
-        const el = document.getElementById(id);
-        if (!el) return;
-        if (id === btnId) {
-          el.classList.remove('btn-secondary');
-          el.classList.add('btn-primary');
-        } else {
-          el.classList.remove('btn-primary');
-          el.classList.add('btn-secondary');
-        }
-      });
-    }
-
-    function adminFormatHours(val) {
-      const num = typeof val === 'number' ? val : parseFloat(val || 0);
-      return (Math.round(num * 100) / 100).toFixed(1) + 'h';
-    }
-
-    function renderAdminWHDailyControls() {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('adminWhControls').innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
-          <input type="date" id="adminWhDailyDate" value="${today}" class="input">
-          <button id="adminWhDailyLoad" class="btn btn-primary">Load</button>
-        </div>
-      `;
-      document.getElementById('adminWhDailyLoad').onclick = loadAdminWorkHoursDaily;
-    }
-
-    function renderAdminWHWeeklyControls() {
-      const now = new Date();
-      const start = new Date(now);
-      start.setDate(start.getDate() - 6);
-      const startStr = start.toISOString().split('T')[0];
-      const endStr = now.toISOString().split('T')[0];
-      document.getElementById('adminWhControls').innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 8px;">
-          <input type="date" id="adminWhWeekStart" value="${startStr}" class="input">
-          <input type="date" id="adminWhWeekEnd" value="${endStr}" class="input">
-          <button id="adminWhWeeklyLoad" class="btn btn-primary">Load</button>
-        </div>
-      `;
-      document.getElementById('adminWhWeeklyLoad').onclick = loadAdminWorkHoursWeekly;
-    }
-
-    function renderAdminWHMonthlyControls() {
-      const d = new Date();
-      const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-      document.getElementById('adminWhControls').innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px;">
-          <input type="month" id="adminWhMonth" value="${ym}" class="input">
-          <button id="adminWhMonthlyLoad" class="btn btn-primary">Load</button>
-        </div>
-      `;
-      document.getElementById('adminWhMonthlyLoad').onclick = loadAdminWorkHoursMonthly;
-    }
-
-    function renderAdminWhTable(employees) {
-      if (!employees || employees.length === 0) {
-        document.getElementById('adminWhTable').innerHTML = '<p style="text-align: center; padding: 20px; color: #9ca3af;">No data for selected period</p>';
-        return;
-      }
-      const html = `
-        <table>
-          <thead>
-            <tr>
-              <th>Employee</th>
-              <th>Total Hours</th>
-              <th>Expected Hours</th>
-              <th>Variance</th>
-              <th>Incomplete</th>
-              <th>Attendance %</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${employees.map(emp => `
-              <tr>
-                <td><strong>${emp.name}</strong><br><small>${emp.employee_id}</small></td>
-                <td>${adminFormatHours(emp.total_hours)}</td>
-                <td>${adminFormatHours(emp.expected_total_hours)}</td>
-                <td>${adminFormatHours(emp.hours_variance)}</td>
-                <td>${emp.incomplete_records}</td>
-                <td>${emp.attendance_rate}%</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      `;
-      document.getElementById('adminWhTable').innerHTML = html;
-    }
-
-    async function loadAdminWorkHoursSummary(startDate, endDate, periodType) {
-      const url = `${API_URL}/work-hours/summary?start_date=${startDate}&end_date=${endDate}&period_type=${periodType}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      document.getElementById('adminWhEmployeeCount').textContent = data.total_employees || 0;
-      const totals = data.employees ? data.employees.reduce((acc, e) => {
-        acc.total += e.total_hours_worked || e.total_hours || 0;
-        acc.expected += e.expected_total_hours || 0;
-        acc.incomplete += e.incomplete_records || 0;
-        return acc;
-      }, { total: 0, expected: 0, incomplete: 0 }) : { total: 0, expected: 0, incomplete: 0 };
-      document.getElementById('adminWhTotalHours').textContent = adminFormatHours(totals.total);
-      document.getElementById('adminWhExpectedHours').textContent = adminFormatHours(totals.expected);
-      document.getElementById('adminWhIncomplete').textContent = totals.incomplete;
-      renderAdminWhTable(data.employees || []);
-    }
-
-    async function loadAdminWorkHoursDaily() {
-      setAdminWhActive('adminWhDailyBtn');
-      const d = document.getElementById('adminWhDailyDate').value;
-      await loadAdminWorkHoursSummary(d, d, 'daily');
-    }
-
-    async function loadAdminWorkHoursWeekly() {
-      setAdminWhActive('adminWhWeeklyBtn');
-      const s = document.getElementById('adminWhWeekStart').value;
-      const e = document.getElementById('adminWhWeekEnd').value;
-      await loadAdminWorkHoursSummary(s, e, 'weekly');
-    }
-
-    async function loadAdminWorkHoursMonthly() {
-      setAdminWhActive('adminWhMonthlyBtn');
-      const ym = document.getElementById('adminWhMonth').value.split('-');
-      const year = parseInt(ym[0]);
-      const month = parseInt(ym[1]);
-      const startDate = `${year}-${String(month).padStart(2,'0')}-01`;
-      const last = new Date(year, month, 0);
-      const endDate = last.toISOString().split('T')[0];
-      await loadAdminWorkHoursSummary(startDate, endDate, 'monthly');
-    }
-
-    function initAdminWorkHoursUI() {
-      const dBtn = document.getElementById('adminWhDailyBtn');
-      const wBtn = document.getElementById('adminWhWeeklyBtn');
-      const mBtn = document.getElementById('adminWhMonthlyBtn');
-      if (!dBtn || !wBtn || !mBtn) return;
-      dBtn.onclick = () => { renderAdminWHDailyControls(); loadAdminWorkHoursDaily(); };
-      wBtn.onclick = () => { renderAdminWHWeeklyControls(); loadAdminWorkHoursWeekly(); };
-      mBtn.onclick = () => { renderAdminWHMonthlyControls(); loadAdminWorkHoursMonthly(); };
-      renderAdminWHWeeklyControls();
-      loadAdminWorkHoursWeekly();
-    }
-
-    function initReportsDefaults() {
-      const today = new Date();
-      const lastWeek = new Date(today);
-      lastWeek.setDate(today.getDate() - 7);
-      const tStr = today.toISOString().split('T')[0];
-      const wStr = lastWeek.toISOString().split('T')[0];
-      ['attSumStart','paySumStart','errStart','breakSumStart'].forEach(id => { const el = document.getElementById(id); if (el && !el.value) el.value = wStr; });
-      ['attSumEnd','paySumEnd','errEnd','breakSumEnd'].forEach(id => { const el = document.getElementById(id); if (el && !el.value) el.value = tStr; });
-    }
-
-    async function loadBreakSummary() {
-      try {
-        const s = document.getElementById('breakSumStart').value;
-        const e = document.getElementById('breakSumEnd').value;
-        
-        // Get all employees
-        const empRes = await fetch(`${API_URL}/employees`);
-        const employees = await empRes.json();
-        
-        let totalBreaks = 0;
-        let totalMinutes = 0;
-        let employeesWithNoBreaks = 0;
-        const employeeBreakData = [];
-        
-        // Get breaks for each employee
-        for (const emp of employees) {
-          const breakRes = await fetch(`${API_URL}/breaks/${emp.employee_id}?start_date=${s}&end_date=${e}`);
-          const breakData = await breakRes.json();
-          
-          const empBreaks = breakData.breaks || [];
-          const empTotalMinutes = empBreaks.reduce((sum, b) => sum + (b.duration_minutes || 0), 0);
-          
-          totalBreaks += empBreaks.length;
-          totalMinutes += empTotalMinutes;
-          
-          if (empBreaks.length === 0) {
-            employeesWithNoBreaks++;
-          }
-          
-          // Break down by type
-          const byType = {};
-          empBreaks.forEach(b => {
-            byType[b.break_type] = (byType[b.break_type] || 0) + (b.duration_minutes || 0);
-          });
-          
-          employeeBreakData.push({
-            employee_id: emp.employee_id,
-            name: emp.name,
-            break_count: empBreaks.length,
-            total_minutes: empTotalMinutes,
-            by_type: byType
-          });
-        }
-        
-        // Update summary stats
-        document.getElementById('breakSumTotal').textContent = totalBreaks;
-        const hours = Math.floor(totalMinutes / 60);
-        const mins = totalMinutes % 60;
-        document.getElementById('breakSumTime').textContent = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-        const avgMinutes = totalBreaks > 0 ? Math.round(totalMinutes / totalBreaks) : 0;
-        document.getElementById('breakSumAvg').textContent = `${avgMinutes}m`;
-        document.getElementById('breakSumNoBreaks').textContent = employeesWithNoBreaks;
-        
-        // Render table
-        const rows = employeeBreakData.map(emp => {
-          const h = Math.floor(emp.total_minutes / 60);
-          const m = emp.total_minutes % 60;
-          const timeStr = h > 0 ? `${h}h ${m}m` : `${m}m`;
-          const avgMins = emp.break_count > 0 ? Math.round(emp.total_minutes / emp.break_count) : 0;
-          
-          // Format break types
-          const typeBreakdown = Object.entries(emp.by_type)
-            .map(([type, mins]) => `${type}: ${mins}m`)
-            .join(', ') || '-';
-          
-          return [
-            emp.employee_id,
-            emp.name,
-            emp.break_count,
-            timeStr,
-            `${avgMins}m`,
-            typeBreakdown
-          ];
-        });
-        
-        renderSimpleTable('breakSumTable', ['Employee ID', 'Name', 'Breaks', 'Total Time', 'Avg Duration', 'By Type'], rows);
-      } catch (err) {
-        console.error('Error loading break summary:', err);
-        renderSimpleTable('breakSumTable', ['Error'], [[err.message]]);
-      }
-    }
-
-    function renderSimpleTable(containerId, headers, rows) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      if (!rows || rows.length === 0) {
-        container.innerHTML = '<p style="text-align: center; padding: 20px; color: #9ca3af;">No data</p>';
-        return;
-      }
-      const thead = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>`;
-      const tbody = `<tbody>${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
-      container.innerHTML = `<table>${thead}${tbody}</table>`;
-    }
-
-    async function loadAttendanceSummary() {
-      try {
-        const s = document.getElementById('attSumStart').value;
-        const e = document.getElementById('attSumEnd').value;
-        const res = await fetch(`${API_URL}/reports/attendance-summary?start_date=${s}&end_date=${e}`);
-        const data = await res.json();
-        if (data.summary) {
-          document.getElementById('attSumRecords').textContent = data.summary.total_records || 0;
-          document.getElementById('attSumCompleted').textContent = data.summary.completed_records || 0;
-          document.getElementById('attSumIncomplete').textContent = data.summary.incomplete_records || 0;
-          document.getElementById('attSumHours').textContent = (Math.round((data.summary.total_hours || 0) * 10)/10) + 'h';
-        }
-        const rows = (data.by_employee || []).map(e => [e.employee_id, e.days_worked, (Math.round((e.total_hours||0)*10)/10)+'h', e.total_records, e.incomplete_records]);
-        renderSimpleTable('attSumTable', ['Employee ID','Days Worked','Total Hours','Records','Incomplete'], rows);
-      } catch (err) {
-        renderSimpleTable('attSumTable', ['Error'], [[err.message]]);
-      }
-    }
-
-    async function loadPayrollSummary() {
-      try {
-        const s = document.getElementById('paySumStart').value;
-        const e = document.getElementById('paySumEnd').value;
-        const rate = parseFloat(document.getElementById('payRate').value) || 70;
-        const res = await fetch(`${API_URL}/reports/payroll-summary?start_date=${s}&end_date=${e}`);
-        const data = await res.json();
-        const rows = (data.employees || []).map(emp => [
-          emp.employee_id,
-          emp.name,
-          (Math.round((emp.total_hours_worked || 0)*10)/10)+'h',
-          (Math.round((emp.expected_total_hours || 0)*10)/10)+'h',
-          (Math.round((emp.hours_variance || 0)*10)/10)+'h',
-          `₱${(Math.round(((emp.total_hours_worked || 0) * rate)*100)/100).toFixed(2)}`,
-          emp.late_count,
-          emp.undertime_count,
-          emp.overtime_count,
-          ((emp.attendance_rate || 0)) + '%',
-          `<button class="btn btn-secondary" onclick="openPayrollBreakdown('${emp.employee_id}')">View</button>`
-        ]);
-        renderSimpleTable('paySumTable', ['ID','Name','Total Hours','Expected','Variance','Payroll','Late','Undertime','Overtime','Attendance %','Actions'], rows);
-      } catch (err) {
-        renderSimpleTable('paySumTable', ['Error'], [[err.message]]);
-      }
-    }
-
-    async function openPayrollBreakdown(employeeId) {
-      try {
-        const s = document.getElementById('paySumStart').value;
-        const e = document.getElementById('paySumEnd').value;
-        const rate = parseFloat(document.getElementById('payRate').value) || 70;
-        const res = await fetch(`${API_URL}/reports/payroll-breakdown/${employeeId}?rate=${rate}&start_date=${s}&end_date=${e}`);
-        const data = await res.json();
-        const header = `Employee: <strong>${employeeId}</strong> • Total Hours: <strong>${(data.totalHours||0).toFixed(2)}h</strong> • Payroll: <strong>₱${(data.payrollAmount||0)}</strong>`;
-        document.getElementById('payrollBreakdownHeader').innerHTML = header;
-        const rows = (data.breakdown || []).map(r => [
-          r.date,
-          (parseFloat(r.hoursWorked||0)).toFixed(2)+'h',
-          r.status && r.status.late ? '❗Yes' : '✔No',
-          r.status && r.status.undertime ? '❗Yes' : '✔No',
-          r.status && r.status.overtime ? '✔Yes' : 'No'
-        ]);
-        renderSimpleTable('payrollBreakdownTable', ['Date','Hours Worked','Late','Undertime','Overtime'], rows);
-        document.getElementById('payrollBreakdownModal').style.display = 'flex';
-      } catch (err) {
-        showNotification('Failed to load payroll breakdown: ' + err.message, 'error');
-      }
-    }
-
-    function closePayrollBreakdownModal() {
-      document.getElementById('payrollBreakdownModal').style.display = 'none';
-    }
-
-    async function loadErrorsMissing() {
-      try {
-        const s = document.getElementById('errStart').value;
-        const e = document.getElementById('errEnd').value;
-        const res = await fetch(`${API_URL}/reports/errors-and-missing?start_date=${s}&end_date=${e}`);
-        const data = await res.json();
-        if (data.summary) {
-          document.getElementById('errIncomplete').textContent = data.summary.total_incomplete_records || 0;
-          document.getElementById('errMissingDays').textContent = data.summary.total_missing_days || 0;
-          document.getElementById('errEmployees').textContent = data.summary.employees_with_issues || 0;
-        }
-        const incRows = (data.incomplete_records || []).map(r => [r.employee_id, r.employee_name, r.work_date, r.clock_in]);
-        renderSimpleTable('errIncompleteTable', ['Employee ID','Name','Date','Clock In'], incRows);
-        const missRows = (data.missing_days || []).map(r => [r.employee_id, r.employee_name, r.missing_date, r.day_of_week]);
-        renderSimpleTable('errMissingTable', ['Employee ID','Name','Missing Date','Day'], missRows);
-      } catch (err) {
-        renderSimpleTable('errIncompleteTable', ['Error'], [[err.message]]);
-        renderSimpleTable('errMissingTable', ['Error'], [[err.message]]);
-      }
-    }
-
     async function loadEmployeeStatus(employeeId) {
       try {
         const today = new Date();
-        const dateStr = today.toISOString().split('T')[0];
+        // Use local date instead of UTC to avoid timezone issues
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+        
         const response = await fetch(`${API_URL}/attendance-status/${employeeId}?start_date=${dateStr}&end_date=${dateStr}`);
         const data = await response.json();
         
@@ -1037,44 +600,6 @@
         }
       } catch (error) {
         console.error('Error loading employee status:', error);
-      }
-    }
-
-    async function adminClockIn(employeeId) {
-      try {
-        const res = await fetch(`${API_URL}/clock-in`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ employee_id: employeeId })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          showNotification(data.error || 'Clock-in failed', 'error');
-          return;
-        }
-        showNotification('Clocked in successfully', 'success');
-        loadEmployeeStatus(employeeId);
-      } catch (err) {
-        showNotification('Clock-in error: ' + err.message, 'error');
-      }
-    }
-
-    async function adminClockOut(employeeId) {
-      try {
-        const res = await fetch(`${API_URL}/clock-out`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ employee_id: employeeId })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          showNotification(data.error || 'Clock-out failed', 'error');
-          return;
-        }
-        showNotification('Clocked out successfully', 'success');
-        loadEmployeeStatus(employeeId);
-      } catch (err) {
-        showNotification('Clock-out error: ' + err.message, 'error');
       }
     }
 
@@ -1135,7 +660,11 @@
       
       try {
         const url = `${API_URL}/schedules/${currentScheduleEmployeeId}`;
-        const payload = { start_time: startTime, end_time: endTime, expected_hours: expectedHours };
+        const payload = { 
+          start_time: startTime, 
+          end_time: endTime, 
+          expected_hours: expectedHours
+        };
         
         console.log('POST to:', url);
         console.log('Payload:', payload);
@@ -1173,13 +702,104 @@
 
     function viewProfile(event) {
       event.preventDefault();
-      showNotification('Profile page coming soon!', 'info');
+      openProfileModal();
       toggleUserMenu();
+    }
+
+    function openProfileModal() {
+      const adminData = sessionStorage.getItem('admin');
+      if (!adminData) {
+        window.location.href = 'employee-login.html';
+        return;
+      }
+      
+      const admin = JSON.parse(adminData);
+      
+      // Set avatar initial
+      const initial = admin.name.charAt(0).toUpperCase();
+      document.getElementById('profileAvatar').textContent = initial;
+      
+      // Set profile information
+      document.getElementById('profileNameDisplay').textContent = admin.name;
+      document.getElementById('profileUsernameDisplay').textContent = '@' + admin.username;
+      document.getElementById('profileName').value = admin.name;
+      document.getElementById('profileUsername').value = admin.username;
+      
+      // Format created date
+      if (admin.created_at) {
+        const date = new Date(admin.created_at);
+        document.getElementById('profileCreatedAt').textContent = date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+      
+      document.getElementById('profileModal').style.display = 'flex';
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').style.display = 'none';
+    }
+
+    async function saveProfile() {
+      const adminData = sessionStorage.getItem('admin');
+      if (!adminData) {
+        showNotification('Session expired. Please login again.', 'error');
+        window.location.href = 'employee-login.html';
+        return;
+      }
+      
+      const admin = JSON.parse(adminData);
+      const newName = document.getElementById('profileName').value.trim();
+      
+      if (!newName) {
+        showNotification('Name cannot be empty', 'warning');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/admins/${admin.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newName })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          // Update session storage
+          admin.name = newName;
+          sessionStorage.setItem('admin', JSON.stringify(admin));
+          
+          // Update UI
+          document.getElementById('navUserName').textContent = newName;
+          document.getElementById('dropdownName').textContent = newName;
+          const initial = newName.charAt(0).toUpperCase();
+          document.getElementById('navUserAvatar').textContent = initial;
+          
+          // Update settings page if loaded
+          const settingsName = document.getElementById('settingsAdminName');
+          if (settingsName) {
+            settingsName.textContent = newName;
+          }
+          
+          showNotification('Profile updated successfully', 'success');
+          closeProfileModal();
+        } else {
+          showNotification(data.error || 'Failed to update profile', 'error');
+        }
+      } catch (error) {
+        console.error('Update profile error:', error);
+        showNotification('Error: ' + error.message, 'error');
+      }
     }
 
     function viewSettings(event) {
       event.preventDefault();
-      showNotification('Settings page coming soon!', 'info');
+      showSection('settings');
       toggleUserMenu();
     }
 
@@ -1245,7 +865,14 @@
       const confirmBtn = document.getElementById('confirmBtn');
       
       titleEl.textContent = title;
-      iconEl.textContent = icon;
+      
+      // Check if icon is an image path or emoji
+      if (icon.includes('.png') || icon.includes('.jpg') || icon.includes('.svg')) {
+        iconEl.innerHTML = `<img src="${icon}" alt="Icon" style="width: 64px; height: 64px;">`;
+      } else {
+        iconEl.textContent = icon;
+      }
+      
       messageEl.textContent = message;
       confirmBtn.textContent = confirmText;
       
@@ -1334,13 +961,103 @@
           console.error('Delete employee error:', error);
           showNotification('Error: ' + error.message, 'error');
         }
-      }, 'Delete Employee', '🗑️', 'Delete');
+      }, 'Delete Employee', 'Images/delete.png', 'Delete');
     }
+
+    // ============================================
+    // SETTINGS FUNCTIONS
+    // ============================================
+
+    function loadSettings() {
+      // Display admin info
+      const adminData = sessionStorage.getItem('admin');
+      if (adminData) {
+        const admin = JSON.parse(adminData);
+        document.getElementById('settingsAdminName').textContent = admin.name;
+        document.getElementById('settingsAdminUsername').textContent = admin.username;
+      }
+    }
+
+    async function changePassword() {
+      const currentPassword = document.getElementById('currentPassword').value.trim();
+      const newPassword = document.getElementById('newPassword').value.trim();
+      const confirmPassword = document.getElementById('confirmPassword').value.trim();
+      
+      // Validation
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        showNotification('Please fill in all password fields', 'warning');
+        return;
+      }
+      
+      if (newPassword.length < 6) {
+        showNotification('New password must be at least 6 characters long', 'warning');
+        return;
+      }
+      
+      if (newPassword !== confirmPassword) {
+        showNotification('New passwords do not match', 'warning');
+        return;
+      }
+      
+      try {
+        const adminData = sessionStorage.getItem('admin');
+        if (!adminData) {
+          showNotification('Session expired. Please login again.', 'error');
+          window.location.href = 'employee-login.html';
+          return;
+        }
+        
+        const admin = JSON.parse(adminData);
+        
+        // First verify current password by attempting login
+        const loginResponse = await fetch(`${API_URL}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            username: admin.username, 
+            password: currentPassword 
+          })
+        });
+        
+        if (!loginResponse.ok) {
+          showNotification('Current password is incorrect', 'error');
+          return;
+        }
+        
+        // Change password (we'll need to add this endpoint to the backend)
+        const response = await fetch(`${API_URL}/admins/${admin.id}/change-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            old_password: currentPassword,
+            new_password: newPassword 
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          showNotification('Password changed successfully', 'success');
+          // Clear password fields
+          document.getElementById('currentPassword').value = '';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('confirmPassword').value = '';
+        } else {
+          showNotification(data.error || 'Failed to change password', 'error');
+        }
+      } catch (error) {
+        console.error('Change password error:', error);
+        showNotification('Error: ' + error.message, 'error');
+      }
+    }
+
+    // Load settings on page load
+    loadSettings();
 
     document.addEventListener('click', function(event) {
       const dropdown = document.getElementById('userDropdown');
       const button = document.querySelector('.navbar-user-button');
-      const modals = ['scheduleModal', 'editEmployeeModal', 'notificationModal', 'confirmationModal'];
+      const modals = ['scheduleModal', 'editEmployeeModal', 'profileModal', 'notificationModal', 'confirmationModal'];
       
       // Close dropdown if clicking outside
       if (dropdown && button && !button.contains(event.target) && !dropdown.contains(event.target)) {
