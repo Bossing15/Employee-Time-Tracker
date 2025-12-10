@@ -106,7 +106,9 @@
         <!-- QR Code Card -->
         <div class="qr-card">
           <div class="qr-card-content">
-            <div class="qr-card-icon">📷</div>
+            <div class="qr-card-icon">
+              <img src="Images/qr (1).png" alt="QR Code" style="width: 48px; height: 48px;">
+            </div>
             <div class="qr-card-text">
               <h3 class="qr-card-title">Attendance QR Code</h3>
               <p class="qr-card-description">Display this QR code at your workplace entrance for employees to scan and clock in/out</p>
@@ -544,14 +546,14 @@
                     </td>
                     <td style="text-align: center;">
                       <button class="action-btn action-btn-info" onclick="openEditEmployeeModal('${emp.employee_id}', '${emp.name.replace(/'/g, "\\'")}', '${emp.username}')" title="Edit Employee">
-                        <span>✏️</span>
+                        <img src="Images/pen.png" alt="Edit" style="width: 18px; height: 18px;">
                       </button>
                       <button class="action-btn action-btn-info schedule-btn" data-employee-id="${emp.employee_id}" data-employee-name="${emp.name}" title="Set Work Schedule">
-                        <span>⏰</span>
+                        <img src="Images/alarm-clock.png" alt="Schedule" style="width: 18px; height: 18px;">
                       </button>
                       ${emp.active === 1 ? `
                         <button class="action-btn action-btn-danger" onclick="deleteEmployee('${emp.employee_id}', '${emp.name.replace(/'/g, "\\'")}')" title="Delete Employee">
-                          <span>🗑️</span>
+                          <img src="Images/delete.png" alt="Delete" style="width: 18px; height: 18px;">
                         </button>
                       ` : ''}
                     </td>
