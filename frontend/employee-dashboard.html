@@ -576,6 +576,72 @@
         </div>
       </div>
 
+      <!-- Break Tracking Card -->
+      <div id="breakCard" class="card" style="display: none;">
+        <div class="card-title">☕ Break Time</div>
+        <div id="activeBreakDisplay" style="display: none; background: #fef3c7; padding: 16px; border-radius: 10px; margin-bottom: 16px;">
+          <div style="text-align: center;">
+            <div style="font-size: 0.9em; color: #92400e; font-weight: 600; margin-bottom: 8px;">On Break</div>
+            <div style="font-size: 2em; color: #92400e; font-weight: 700;" id="breakElapsedTime">0:00</div>
+            <div style="font-size: 0.85em; color: #92400e; margin-top: 4px;" id="breakTypeDisplay">Break</div>
+          </div>
+        </div>
+        <div id="breakButtons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <button onclick="startBreak()" id="startBreakBtn" style="padding: 14px; background: #f59e0b; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.95em;">
+            Start Break
+          </button>
+          <button onclick="endBreak()" id="endBreakBtn" style="display: none; padding: 14px; background: #10b981; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; font-size: 0.95em;">
+            End Break
+          </button>
+        </div>
+        <div id="breakSummary" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+          <div style="font-size: 0.9em; color: #6b7280; font-weight: 600; margin-bottom: 8px;">Today's Breaks</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div style="background: #f3f4f6; padding: 12px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 0.75em; color: #6b7280; margin-bottom: 4px;">Total Breaks</div>
+              <div style="font-size: 1.4em; color: #1f2937; font-weight: 700;" id="totalBreaksCount">0</div>
+            </div>
+            <div style="background: #f3f4f6; padding: 12px; border-radius: 8px; text-align: center;">
+              <div style="font-size: 0.75em; color: #6b7280; margin-bottom: 4px;">Total Time</div>
+              <div style="font-size: 1.4em; color: #1f2937; font-weight: 700;" id="totalBreakTime">0m</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Work Hours Summary Card -->
+      <div class="card">
+        <div class="card-title">📊 My Work Hours</div>
+        <div style="display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto;">
+          <button onclick="showWorkHoursPeriod('week')" id="whWeekBtn" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9em; white-space: nowrap;">This Week</button>
+          <button onclick="showWorkHoursPeriod('month')" id="whMonthBtn" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.9em; white-space: nowrap;">This Month</button>
+        </div>
+        <div id="workHoursPeriodDisplay" style="font-size: 0.85em; color: #6b7280; margin-bottom: 12px; text-align: center;">-</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+          <div style="background: #dbeafe; padding: 16px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 0.8em; color: #1e40af; font-weight: 600; margin-bottom: 6px;">Hours Worked</div>
+            <div id="whTotalHours" style="font-size: 1.8em; color: #1e40af; font-weight: 700;">0h</div>
+          </div>
+          <div style="background: #f3f4f6; padding: 16px; border-radius: 10px; text-align: center;">
+            <div style="font-size: 0.8em; color: #6b7280; font-weight: 600; margin-bottom: 6px;">Expected</div>
+            <div id="whExpectedHours" style="font-size: 1.8em; color: #374151; font-weight: 700;">0h</div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+          <div style="background: #f3f4f6; padding: 12px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.7em; color: #6b7280; margin-bottom: 4px;">Days</div>
+            <div id="whDaysWorked" style="font-size: 1.3em; color: #1f2937; font-weight: 700;">0</div>
+          </div>
+          <div style="background: #fee2e2; padding: 12px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.7em; color: #991b1b; margin-bottom: 4px;">Late</div>
+            <div id="whLateCount" style="font-size: 1.3em; color: #dc2626; font-weight: 700;">0</div>
+          </div>
+          <div style="background: #d1fae5; padding: 12px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 0.7em; color: #065f46; margin-bottom: 4px;">Overtime</div>
+            <div id="whOvertimeCount" style="font-size: 1.3em; color: #059669; font-weight: 700;">0</div>
+          </div>
+        </div>
+      </div>
 
     </div>
   </div>
@@ -1167,6 +1233,231 @@
     function openScanner() {
       window.location.href = `scanner.html?id=${employeeId}`;
     }
+
+    // ============================================
+    // BREAK TRACKING FUNCTIONS
+    // ============================================
+    
+    let breakInterval = null;
+    let breakStartTime = null;
+
+    async function loadBreakStatus() {
+      try {
+        const response = await fetch(`${API_URL}/breaks/active/${employeeId}`);
+        const data = await response.json();
+        
+        if (data.active_break) {
+          // Show active break
+          document.getElementById('activeBreakDisplay').style.display = 'block';
+          document.getElementById('startBreakBtn').style.display = 'none';
+          document.getElementById('endBreakBtn').style.display = 'block';
+          document.getElementById('breakTypeDisplay').textContent = data.active_break.break_type;
+          
+          breakStartTime = new Date(data.active_break.start_time);
+          startBreakTimer();
+        } else {
+          // No active break
+          document.getElementById('activeBreakDisplay').style.display = 'none';
+          document.getElementById('startBreakBtn').style.display = 'block';
+          document.getElementById('endBreakBtn').style.display = 'none';
+          stopBreakTimer();
+        }
+        
+        // Load today's break summary
+        await loadBreakSummary();
+      } catch (error) {
+        console.error('Error loading break status:', error);
+      }
+    }
+
+    async function loadBreakSummary() {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const response = await fetch(`${API_URL}/breaks/${employeeId}?start_date=${today}&end_date=${today}`);
+        const data = await response.json();
+        
+        const summary = data.summary || {};
+        document.getElementById('totalBreaksCount').textContent = summary.total_breaks || 0;
+        document.getElementById('totalBreakTime').textContent = Math.round((summary.total_minutes || 0)) + 'm';
+      } catch (error) {
+        console.error('Error loading break summary:', error);
+      }
+    }
+
+    function startBreakTimer() {
+      if (breakInterval) clearInterval(breakInterval);
+      
+      breakInterval = setInterval(() => {
+        if (breakStartTime) {
+          const now = new Date();
+          const elapsed = Math.floor((now - breakStartTime) / 1000);
+          const minutes = Math.floor(elapsed / 60);
+          const seconds = elapsed % 60;
+          document.getElementById('breakElapsedTime').textContent = 
+            `${minutes}:${String(seconds).padStart(2, '0')}`;
+        }
+      }, 1000);
+    }
+
+    function stopBreakTimer() {
+      if (breakInterval) {
+        clearInterval(breakInterval);
+        breakInterval = null;
+      }
+      breakStartTime = null;
+    }
+
+    async function startBreak() {
+      const breakType = prompt('Break type (e.g., Lunch, Coffee Break, Personal):', 'Break');
+      if (!breakType) return;
+      
+      try {
+        const response = await fetch(`${API_URL}/breaks/start`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            employee_id: employeeId,
+            break_type: breakType
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          await loadBreakStatus();
+        } else {
+          alert(data.error || 'Failed to start break');
+        }
+      } catch (error) {
+        console.error('Error starting break:', error);
+        alert('Error starting break');
+      }
+    }
+
+    async function endBreak() {
+      try {
+        const response = await fetch(`${API_URL}/breaks/end`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            employee_id: employeeId
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          await loadBreakStatus();
+          alert(`Break ended. Duration: ${data.break.duration_minutes} minutes`);
+        } else {
+          alert(data.error || 'Failed to end break');
+        }
+      } catch (error) {
+        console.error('Error ending break:', error);
+        alert('Error ending break');
+      }
+    }
+
+    // ============================================
+    // WORK HOURS MONITORING FUNCTIONS
+    // ============================================
+    
+    let currentWorkHoursPeriod = 'week';
+
+    async function loadWorkHours() {
+      const today = new Date();
+      let startDate, endDate;
+      
+      if (currentWorkHoursPeriod === 'week') {
+        const weekStart = new Date(today);
+        weekStart.setDate(weekStart.getDate() - 6);
+        startDate = weekStart.toISOString().split('T')[0];
+        endDate = today.toISOString().split('T')[0];
+        
+        document.getElementById('workHoursPeriodDisplay').textContent = 
+          `${formatLongDate(startDate)} - ${formatLongDate(endDate)}`;
+      } else {
+        const year = today.getFullYear();
+        const month = today.getMonth() + 1;
+        startDate = `${year}-${String(month).padStart(2,'0')}-01`;
+        const lastDay = new Date(year, month, 0);
+        endDate = lastDay.toISOString().split('T')[0];
+        
+        document.getElementById('workHoursPeriodDisplay').textContent = 
+          `${formatLongDate(startDate)} - ${formatLongDate(endDate)}`;
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/attendance-status/${employeeId}?start_date=${startDate}&end_date=${endDate}`);
+        const data = await response.json();
+        
+        const summary = data.summary || {};
+        const schedule = data.schedule || {};
+        
+        // Calculate expected hours
+        const daysInPeriod = Math.ceil((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24)) + 1;
+        const expectedWorkDays = Math.floor(daysInPeriod * 5 / 7); // Rough estimate
+        const expectedHours = expectedWorkDays * (schedule.expectedHours || 8);
+        
+        // Calculate totals
+        const totalHours = data.records ? data.records.reduce((sum, r) => sum + (r.hoursWorked || 0), 0) : 0;
+        const daysWorked = data.records ? new Set(data.records.map(r => r.clock_in.split(' ')[0])).size : 0;
+        const lateCount = summary.late_count || 0;
+        const overtimeCount = summary.overtime_count || 0;
+        
+        document.getElementById('whTotalHours').textContent = totalHours.toFixed(1) + 'h';
+        document.getElementById('whExpectedHours').textContent = expectedHours.toFixed(1) + 'h';
+        document.getElementById('whDaysWorked').textContent = daysWorked;
+        document.getElementById('whLateCount').textContent = lateCount;
+        document.getElementById('whOvertimeCount').textContent = overtimeCount;
+      } catch (error) {
+        console.error('Error loading work hours:', error);
+      }
+    }
+
+    function showWorkHoursPeriod(period) {
+      currentWorkHoursPeriod = period;
+      
+      // Update button styles
+      document.getElementById('whWeekBtn').className = period === 'week' ? 'btn btn-primary' : 'btn btn-secondary';
+      document.getElementById('whMonthBtn').className = period === 'month' ? 'btn btn-primary' : 'btn btn-secondary';
+      
+      loadWorkHours();
+    }
+
+    // Helper function for date formatting
+    function formatLongDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    }
+
+    // ============================================
+    // INITIALIZE NEW FEATURES
+    // ============================================
+    
+    // Update the main initialization to include new features
+    const originalLoadStatus = loadStatus;
+    loadStatus = async function() {
+      await originalLoadStatus();
+      
+      // Check if clocked in to show break card
+      const statusResponse = await fetch(`${API_URL}/status/${employeeId}`);
+      const statusData = await statusResponse.json();
+      
+      if (statusData.clocked_in) {
+        document.getElementById('breakCard').style.display = 'block';
+        await loadBreakStatus();
+      } else {
+        document.getElementById('breakCard').style.display = 'none';
+      }
+      
+      // Load work hours
+      await loadWorkHours();
+    };
 
 
 
