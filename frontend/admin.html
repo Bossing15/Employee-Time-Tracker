@@ -150,6 +150,7 @@
               <button id="adminWhMonthlyBtn" class="btn btn-secondary btn-sm">Monthly</button>
             </div>
           </div>
+          <div id="adminWhDateRange" style="margin-top: 8px; margin-bottom: 8px; font-size: 0.95em; color: #6b7280; font-weight: 500;"></div>
           <div id="adminWhControls" style="margin-top: 12px;"></div>
           <div class="stats-grid" style="margin-top: 12px;">
             <div class="stat-card">
@@ -413,6 +414,21 @@
       window.location.href = 'login.html';
     }
 
+    // Helper function to format dates as "December 10, 2025"
+    function formatLongDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    }
+
+    // Helper function to format date range as "December 10, 2025 - December 17, 2025"
+    function formatDateRange(startDate, endDate) {
+      return `${formatLongDate(startDate)} - ${formatLongDate(endDate)}`;
+    }
+
     function showSection(sectionName) {
       document.querySelectorAll('.content-section').forEach(section => {
         section.style.display = 'none';
@@ -537,7 +553,7 @@
                     <td><strong>${emp.employee_id}</strong></td>
                     <td>${emp.name}</td>
                     <td>${emp.username}</td>
-                    <td>${new Date(emp.created_at).toLocaleDateString()}</td>
+                    <td>${formatLongDate(emp.created_at)}</td>
                     <td style="text-align: center;">
                       <span class="status-badge" data-employee-id="${emp.employee_id}" style="font-size: 0.8em; padding: 4px 8px;">-</span>
                     </td>
@@ -737,6 +753,10 @@
       const url = `${API_URL}/work-hours/summary?start_date=${startDate}&end_date=${endDate}&period_type=${periodType}`;
       const res = await fetch(url);
       const data = await res.json();
+      
+      // Display date range
+      document.getElementById('adminWhDateRange').textContent = formatDateRange(startDate, endDate);
+      
       document.getElementById('adminWhEmployeeCount').textContent = data.total_employees || 0;
       const totals = data.employees ? data.employees.reduce((acc, e) => {
         acc.total += e.total_hours_worked || e.total_hours || 0;
