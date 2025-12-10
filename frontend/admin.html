@@ -549,12 +549,6 @@
                       <button class="action-btn action-btn-info schedule-btn" data-employee-id="${emp.employee_id}" data-employee-name="${emp.name}" title="Set Work Schedule">
                         <span>⏰</span>
                       </button>
-                      <button class="action-btn" onclick="adminClockIn('${emp.employee_id}')" title="Clock In">
-                        <span>🟢</span>
-                      </button>
-                      <button class="action-btn" onclick="adminClockOut('${emp.employee_id}')" title="Clock Out">
-                        <span>🔴</span>
-                      </button>
                       ${emp.active === 1 ? `
                         <button class="action-btn action-btn-danger" onclick="deleteEmployee('${emp.employee_id}', '${emp.name.replace(/'/g, "\\'")}')" title="Delete Employee">
                           <span>🗑️</span>
