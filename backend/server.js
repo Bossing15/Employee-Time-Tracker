@@ -126,6 +126,39 @@ db.serialize(() => {
       console.error('Error adding net_hours_worked column:', err);
     }
   });
+
+  // System Settings Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS system_settings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      setting_key TEXT UNIQUE NOT NULL,
+      setting_value TEXT NOT NULL,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `, (err) => {
+    if (err) {
+      console.error('Error creating system_settings table:', err);
+    } else {
+      console.log('system_settings table ready');
+      // Initialize default settings
+      db.run(`INSERT OR IGNORE INTO system_settings (setting_key, setting_value) VALUES ('default_hourly_rate', '70')`, (err) => {
+        if (err) console.error('Error setting default hourly rate:', err);
+      });
+      db.run(`INSERT OR IGNORE INTO system_settings (setting_key, setting_value) VALUES ('cutoff_day_1', '15')`, (err) => {
+        if (err) console.error('Error setting cutoff day 1:', err);
+      });
+      db.run(`INSERT OR IGNORE INTO system_settings (setting_key, setting_value) VALUES ('cutoff_day_2', '30')`, (err) => {
+        if (err) console.error('Error setting cutoff day 2:', err);
+      });
+    }
+  });
+
+  // Add hourly_rate column to employees table
+  db.run(`ALTER TABLE employees ADD COLUMN hourly_rate REAL`, (err) => {
+    if (err && !err.message.includes('duplicate column')) {
+      console.error('Error adding hourly_rate column:', err);
+    }
+  });
 });
 
 const app = express();
@@ -329,8 +362,8 @@ app.post('/api/employees', (req, res) => {
 app.get('/api/employees', (req, res) => {
   const includeInactive = req.query.include_inactive === 'true';
   const query = includeInactive 
-    ? 'SELECT id, employee_id, name, username, active, created_at FROM employees ORDER BY name'
-    : 'SELECT id, employee_id, name, username, active, created_at FROM employees WHERE active = 1 ORDER BY name';
+    ? 'SELECT id, employee_id, name, username, active, created_at, hourly_rate FROM employees ORDER BY name'
+    : 'SELECT id, employee_id, name, username, active, created_at, hourly_rate FROM employees WHERE active = 1 ORDER BY name';
   
   db.all(query, [], (err, employees) => {
     if (err) {
@@ -338,6 +371,82 @@ app.get('/api/employees', (req, res) => {
     }
     res.json(employees);
   });
+});
+
+// ================== SYSTEM SETTINGS API ================== //
+app.get('/api/settings', (req, res) => {
+  db.all('SELECT setting_key, setting_value FROM system_settings', [], (err, settings) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error occurred' });
+    }
+    const settingsObj = {};
+    settings.forEach(s => {
+      settingsObj[s.setting_key] = s.setting_value;
+    });
+    res.json(settingsObj);
+  });
+});
+
+app.put('/api/settings', (req, res) => {
+  const { default_hourly_rate, cutoff_day_1, cutoff_day_2 } = req.body;
+  
+  const updates = [];
+  if (default_hourly_rate !== undefined) {
+    updates.push({ key: 'default_hourly_rate', value: default_hourly_rate.toString() });
+  }
+  if (cutoff_day_1 !== undefined) {
+    updates.push({ key: 'cutoff_day_1', value: cutoff_day_1.toString() });
+  }
+  if (cutoff_day_2 !== undefined) {
+    updates.push({ key: 'cutoff_day_2', value: cutoff_day_2.toString() });
+  }
+  
+  let completed = 0;
+  let hasError = false;
+  
+  updates.forEach(update => {
+    db.run(
+      'UPDATE system_settings SET setting_value = ?, updated_at = CURRENT_TIMESTAMP WHERE setting_key = ?',
+      [update.value, update.key],
+      (err) => {
+        if (err && !hasError) {
+          hasError = true;
+          return res.status(500).json({ error: 'Database error occurred' });
+        }
+        completed++;
+        if (completed === updates.length && !hasError) {
+          res.json({ message: 'Settings updated successfully' });
+        }
+      }
+    );
+  });
+  
+  if (updates.length === 0) {
+    res.json({ message: 'No settings to update' });
+  }
+});
+
+app.put('/api/employees/:employee_id/rate', (req, res) => {
+  const { employee_id } = req.params;
+  const { hourly_rate } = req.body;
+  
+  if (hourly_rate === undefined || hourly_rate === null) {
+    return res.status(400).json({ error: 'Hourly rate is required' });
+  }
+  
+  db.run(
+    'UPDATE employees SET hourly_rate = ?, updated_at = CURRENT_TIMESTAMP WHERE employee_id = ?',
+    [hourly_rate, employee_id],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: 'Database error occurred' });
+      }
+      if (this.changes === 0) {
+        return res.status(404).json({ error: 'Employee not found' });
+      }
+      res.json({ message: 'Hourly rate updated successfully' });
+    }
+  );
 });
 
 app.post('/api/clock-in', (req, res) => {
@@ -2481,7 +2590,7 @@ if (fs.existsSync(certPath) && fs.existsSync(keyPath)) {
     key: fs.readFileSync(keyPath)
   };
   
-  https.createServer(options, app).listen(PORT, () => {
+  https.createServer(options, app).listen(PORT, '0.0.0.0', () => {
     const localIP = getLocalIP();
     console.log(`\n🚀 Attendance System Started (HTTPS)`);
     console.log(`   Local:   https://localhost:${PORT}`);

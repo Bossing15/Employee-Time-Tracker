@@ -41,6 +41,12 @@
               <span>Reports</span>
             </a>
           </li>
+          <li class="sidebar-menu-item">
+            <a href="#" class="sidebar-menu-link" onclick="showSection('settings'); return false;">
+              <span class="sidebar-menu-icon">⚙️</span>
+              <span>Settings</span>
+            </a>
+          </li>
         </ul>
       </div>
 
@@ -362,6 +368,52 @@
       </div>
 
       </div>
+
+      <!-- Settings Section -->
+      <div id="settings-section" class="content-section" style="display: none;">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">⚙️ System Settings</h2>
+          </div>
+          
+          <!-- Payroll Settings -->
+          <div style="margin-bottom: 32px;">
+            <h3 style="font-size: 1.1em; font-weight: 600; color: #1f2937; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb;">💰 Payroll Settings</h3>
+            
+            <div style="margin-bottom: 20px;">
+              <label for="defaultHourlyRate" style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937;">Default Hourly Rate (₱)</label>
+              <input type="number" id="defaultHourlyRate" class="input" placeholder="70" step="0.01" min="0" style="max-width: 300px;">
+              <p style="font-size: 0.85em; color: #6b7280; margin-top: 4px;">This rate will be used for employees without a custom rate</p>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1f2937;">Payroll Cutoff Dates</label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 400px;">
+                <div>
+                  <label for="cutoffDay1" style="display: block; margin-bottom: 5px; font-size: 0.9em; color: #6b7280;">First Cutoff (Day of Month)</label>
+                  <input type="number" id="cutoffDay1" class="input" placeholder="15" min="1" max="31">
+                </div>
+                <div>
+                  <label for="cutoffDay2" style="display: block; margin-bottom: 5px; font-size: 0.9em; color: #6b7280;">Second Cutoff (Day of Month)</label>
+                  <input type="number" id="cutoffDay2" class="input" placeholder="30" min="1" max="31">
+                </div>
+              </div>
+              <p style="font-size: 0.85em; color: #6b7280; margin-top: 4px;">Payroll periods will be calculated based on these cutoff dates</p>
+            </div>
+            
+            <button class="btn btn-primary" onclick="saveSystemSettings()">Save Settings</button>
+          </div>
+          
+          <!-- Employee Rates -->
+          <div>
+            <h3 style="font-size: 1.1em; font-weight: 600; color: #1f2937; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb;">👥 Employee Hourly Rates</h3>
+            <p style="font-size: 0.9em; color: #6b7280; margin-bottom: 16px;">Set custom hourly rates for individual employees. Leave blank to use the default rate.</p>
+            
+            <div id="employeeRatesTable" style="overflow-x: auto;"></div>
+          </div>
+        </div>
+      </div>
+
     </main>
 
     <!-- Edit Employee Modal -->
@@ -533,6 +585,8 @@
         loadEmployeeList();
       } else if (sectionName === 'reports') {
         initReportsDefaults();
+      } else if (sectionName === 'settings') {
+        loadSettings();
       }
     }
 
@@ -1669,6 +1723,149 @@
         }
       });
     });
+
+    // ============================================
+    // SETTINGS FUNCTIONS
+    // ============================================
+
+    async function loadSettings() {
+      try {
+        // Load system settings
+        const response = await fetch(`${API_URL}/settings`);
+        const settings = await response.json();
+        
+        document.getElementById('defaultHourlyRate').value = settings.default_hourly_rate || '70';
+        document.getElementById('cutoffDay1').value = settings.cutoff_day_1 || '15';
+        document.getElementById('cutoffDay2').value = settings.cutoff_day_2 || '30';
+        
+        // Load employee rates
+        await loadEmployeeRates();
+      } catch (error) {
+        console.error('Error loading settings:', error);
+        showNotification('Error loading settings', 'error');
+      }
+    }
+
+    async function saveSystemSettings() {
+      try {
+        const defaultRate = parseFloat(document.getElementById('defaultHourlyRate').value);
+        const cutoff1 = parseInt(document.getElementById('cutoffDay1').value);
+        const cutoff2 = parseInt(document.getElementById('cutoffDay2').value);
+        
+        if (isNaN(defaultRate) || defaultRate < 0) {
+          showNotification('Please enter a valid hourly rate', 'error');
+          return;
+        }
+        
+        if (isNaN(cutoff1) || cutoff1 < 1 || cutoff1 > 31) {
+          showNotification('First cutoff must be between 1 and 31', 'error');
+          return;
+        }
+        
+        if (isNaN(cutoff2) || cutoff2 < 1 || cutoff2 > 31) {
+          showNotification('Second cutoff must be between 1 and 31', 'error');
+          return;
+        }
+        
+        const response = await fetch(`${API_URL}/settings`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            default_hourly_rate: defaultRate,
+            cutoff_day_1: cutoff1,
+            cutoff_day_2: cutoff2
+          })
+        });
+        
+        if (response.ok) {
+          showNotification('Settings saved successfully', 'success');
+        } else {
+          showNotification('Error saving settings', 'error');
+        }
+      } catch (error) {
+        console.error('Error saving settings:', error);
+        showNotification('Error saving settings', 'error');
+      }
+    }
+
+    async function loadEmployeeRates() {
+      try {
+        const response = await fetch(`${API_URL}/employees?include_inactive=false`);
+        const employees = await response.json();
+        
+        const settingsResponse = await fetch(`${API_URL}/settings`);
+        const settings = await settingsResponse.json();
+        const defaultRate = settings.default_hourly_rate || '70';
+        
+        const tableHtml = `
+          <table>
+            <thead>
+              <tr>
+                <th>Employee ID</th>
+                <th>Name</th>
+                <th>Hourly Rate (₱)</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${employees.map(emp => `
+                <tr>
+                  <td>${emp.employee_id}</td>
+                  <td>${emp.name}</td>
+                  <td>
+                    <input type="number" 
+                           id="rate_${emp.employee_id}" 
+                           value="${emp.hourly_rate || ''}" 
+                           placeholder="${defaultRate} (default)"
+                           step="0.01" 
+                           min="0"
+                           style="width: 150px; padding: 8px; border: 2px solid #e5e7eb; border-radius: 6px;">
+                  </td>
+                  <td>
+                    <button class="btn btn-primary btn-sm" onclick="saveEmployeeRate('${emp.employee_id}')">Save</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+        
+        document.getElementById('employeeRatesTable').innerHTML = tableHtml;
+      } catch (error) {
+        console.error('Error loading employee rates:', error);
+        showNotification('Error loading employee rates', 'error');
+      }
+    }
+
+    async function saveEmployeeRate(employeeId) {
+      try {
+        const rateInput = document.getElementById(`rate_${employeeId}`);
+        const rate = rateInput.value.trim();
+        
+        // If empty, set to null (use default)
+        const hourlyRate = rate === '' ? null : parseFloat(rate);
+        
+        if (hourlyRate !== null && (isNaN(hourlyRate) || hourlyRate < 0)) {
+          showNotification('Please enter a valid hourly rate', 'error');
+          return;
+        }
+        
+        const response = await fetch(`${API_URL}/employees/${employeeId}/rate`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hourly_rate: hourlyRate })
+        });
+        
+        if (response.ok) {
+          showNotification(`Hourly rate updated for ${employeeId}`, 'success');
+        } else {
+          showNotification('Error updating hourly rate', 'error');
+        }
+      } catch (error) {
+        console.error('Error saving employee rate:', error);
+        showNotification('Error saving employee rate', 'error');
+      }
+    }
   </script>
 </body>
 </html>
