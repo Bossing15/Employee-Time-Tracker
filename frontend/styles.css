@@ -278,8 +278,10 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 240px;
+  right: 0;
   z-index: 100;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 
               0 1px 2px 0 rgba(0, 0, 0, 0.06);
@@ -355,6 +357,7 @@ body {
 .content-area {
   flex: 1;
   padding: 30px 40px;
+  padding-top: 100px;
   overflow-y: auto;
 }
 
@@ -808,6 +811,7 @@ select:focus {
 
   .top-navbar {
     padding: 16px 20px;
+    left: 0;
   }
 
   .navbar-title {
@@ -864,6 +868,21 @@ select:focus {
 
   .qr-view-button {
     width: 100%;
+  }
+
+  /* Settings Section Responsive */
+  #employeeRatesTable table {
+    font-size: 0.85em;
+  }
+
+  #employeeRatesTable input[type="number"] {
+    width: 100px !important;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
   }
 }
 
