@@ -356,8 +356,8 @@ body {
 /* Content Area */
 .content-area {
   flex: 1;
-  padding: 30px 40px;
-  padding-top: 90px;
+  padding: 20px 40px;
+  padding-top: 80px;
   overflow-y: auto;
 }
 
