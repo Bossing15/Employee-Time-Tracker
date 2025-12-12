@@ -44,7 +44,7 @@
         </ul>
       </div>
 
-      <div class="sidebar-section" style="margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+      <div class="sidebar-section" style="margin-top: auto; padding-top: 10px; padding-bottom: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);"></div>
         <ul class="sidebar-menu">
           <li class="sidebar-menu-item">
             <a href="#" class="sidebar-menu-link" onclick="showSection('settings'); return false;">
@@ -211,8 +211,14 @@
             <select id="empReportSelect" class="input" style="padding: 10px;">
               <option value="">Select Employee...</option>
             </select>
-            <input type="date" id="empReportStart" class="input">
-            <input type="date" id="empReportEnd" class="input">
+            <div style="position: relative;">
+              <input type="date" id="empReportStart" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+              <div id="empReportStartDisplay" onclick="document.getElementById('empReportStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
+            </div>
+            <div style="position: relative;">
+              <input type="date" id="empReportEnd" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+              <div id="empReportEndDisplay" onclick="document.getElementById('empReportEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
+            </div>
             <button class="btn btn-primary" onclick="loadEmployeeReport()">Generate Report</button>
           </div>
           
@@ -297,8 +303,14 @@
             <h2 class="card-title">Attendance Summary</h2>
           </div>
           <div class="grid-controls-3">
-            <input type="date" id="attSumStart" class="input">
-            <input type="date" id="attSumEnd" class="input">
+            <div style="position: relative;">
+              <input type="date" id="attSumStart" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+              <div id="attSumStartDisplay" onclick="document.getElementById('attSumStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
+            </div>
+            <div style="position: relative;">
+              <input type="date" id="attSumEnd" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+              <div id="attSumEndDisplay" onclick="document.getElementById('attSumEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
+            </div>
             <button class="btn btn-primary" onclick="loadAttendanceSummary()">Load</button>
           </div>
           <div class="stats-grid">
@@ -316,8 +328,14 @@
             <h2 class="card-title">Break Time Summary</h2>
           </div>
           <div class="grid-controls-3">
-            <input type="date" id="breakSumStart" class="input">
-            <input type="date" id="breakSumEnd" class="input">
+            <div style="position: relative;">
+              <input type="date" id="breakSumStart" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+              <div id="breakSumStartDisplay" onclick="document.getElementById('breakSumStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
+            </div>
+            <div style="position: relative;">
+              <input type="date" id="breakSumEnd" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+              <div id="breakSumEndDisplay" onclick="document.getElementById('breakSumEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
+            </div>
             <button class="btn btn-primary" onclick="loadBreakSummary()">Load</button>
           </div>
           <div class="stats-grid">
@@ -335,8 +353,14 @@
             <h2 class="card-title">Errors & Missing Logs</h2>
           </div>
           <div class="grid-controls-3">
-            <input type="date" id="errStart" class="input">
-            <input type="date" id="errEnd" class="input">
+            <div style="position: relative;">
+              <input type="date" id="errStart" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+              <div id="errStartDisplay" onclick="document.getElementById('errStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
+            </div>
+            <div style="position: relative;">
+              <input type="date" id="errEnd" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+              <div id="errEndDisplay" onclick="document.getElementById('errEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
+            </div>
             <button class="btn btn-primary" onclick="loadErrorsMissing()">Load</button>
           </div>
           <div class="stats-grid">
@@ -360,8 +384,14 @@
             <h2 class="card-title">Payroll Attendance Summary</h2>
           </div>
           <div class="grid-controls-4-rate">
-            <input type="date" id="paySumStart" class="input">
-            <input type="date" id="paySumEnd" class="input">
+            <div style="position: relative;">
+              <input type="date" id="paySumStart" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+              <div id="paySumStartDisplay" onclick="document.getElementById('paySumStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
+            </div>
+            <div style="position: relative;">
+              <input type="date" id="paySumEnd" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+              <div id="paySumEndDisplay" onclick="document.getElementById('paySumEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
+            </div>
             <input type="number" id="payRate" class="input" placeholder="Rate per Hour" value="70" min="0" step="0.01">
             <button class="btn btn-primary" onclick="loadPayrollSummary()">Load</button>
           </div>
@@ -372,7 +402,7 @@
       <!-- Settings Section -->
       <div id="settings-section" class="content-section" style="display: none;">
         <!-- Payroll Settings Card -->
-        <div class="card" style="margin-top: 0;">
+        <div class="card" style="margin-top: 0;"></div>
           <div class="card-header">
             <h2 class="card-title">💰 Payroll Settings</h2>
           </div>
@@ -1001,8 +1031,32 @@
       lastWeek.setDate(today.getDate() - 7);
       const tStr = today.toISOString().split('T')[0];
       const wStr = lastWeek.toISOString().split('T')[0];
-      ['attSumStart','paySumStart','errStart','breakSumStart','empReportStart'].forEach(id => { const el = document.getElementById(id); if (el && !el.value) el.value = wStr; });
-      ['attSumEnd','paySumEnd','errEnd','breakSumEnd','empReportEnd'].forEach(id => { const el = document.getElementById(id); if (el && !el.value) el.value = tStr; });
+      
+      // Set date values and formatted displays
+      const dateInputs = [
+        {input: 'attSumStart', display: 'attSumStartDisplay', value: wStr},
+        {input: 'attSumEnd', display: 'attSumEndDisplay', value: tStr},
+        {input: 'paySumStart', display: 'paySumStartDisplay', value: wStr},
+        {input: 'paySumEnd', display: 'paySumEndDisplay', value: tStr},
+        {input: 'errStart', display: 'errStartDisplay', value: wStr},
+        {input: 'errEnd', display: 'errEndDisplay', value: tStr},
+        {input: 'breakSumStart', display: 'breakSumStartDisplay', value: wStr},
+        {input: 'breakSumEnd', display: 'breakSumEndDisplay', value: tStr},
+        {input: 'empReportStart', display: 'empReportStartDisplay', value: wStr},
+        {input: 'empReportEnd', display: 'empReportEndDisplay', value: tStr}
+      ];
+      
+      dateInputs.forEach(item => {
+        const inputEl = document.getElementById(item.input);
+        const displayEl = document.getElementById(item.display);
+        if (inputEl && displayEl) {
+          inputEl.value = item.value;
+          displayEl.textContent = formatLongDate(item.value);
+          inputEl.addEventListener('change', function() {
+            displayEl.textContent = formatLongDate(this.value);
+          });
+        }
+      });
       
       // Populate employee dropdown for individual report
       try {
