@@ -343,6 +343,54 @@ app.post('/api/admins/reset-password', async (req, res) => {
   });
 });
 
+// Update admin profile
+app.put('/api/admins/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, current_password, new_password } = req.body;
+
+  if (!name || name.trim().length === 0) {
+    return res.status(400).json({ error: 'Name is required' });
+  }
+
+  db.get('SELECT id, password FROM admins WHERE id = ?', [id], async (err, admin) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error occurred' });
+    }
+    if (!admin) {
+      return res.status(404).json({ error: 'Admin not found' });
+    }
+
+    // Update name and optionally password
+    if (new_password && new_password.length >= 6) {
+      // Verify current password first
+      if (!current_password) {
+        return res.status(400).json({ error: 'Current password is required to change password' });
+      }
+      const isValidPassword = await verifyPassword(current_password, admin.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ error: 'Current password is incorrect' });
+      }
+
+      const hashed = await hashPassword(new_password);
+      db.run('UPDATE admins SET name = ?, password = ? WHERE id = ?', [name.trim(), hashed, id], function (updateErr) {
+        if (updateErr) {
+          return res.status(500).json({ error: 'Database error occurred' });
+        }
+        res.json({ success: true, message: 'Profile updated successfully' });
+      });
+    } else if (new_password && new_password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters' });
+    } else {
+      db.run('UPDATE admins SET name = ? WHERE id = ?', [name.trim(), id], function (updateErr) {
+        if (updateErr) {
+          return res.status(500).json({ error: 'Database error occurred' });
+        }
+        res.json({ success: true, message: 'Profile updated successfully' });
+      });
+    }
+  });
+});
+
 app.post('/api/employees', (req, res) => {
   const { employee_id, name } = req.body;
   

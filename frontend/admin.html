@@ -203,7 +203,7 @@
           <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2 class="card-title">👤 Individual Employee Report</h2>
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 8px; margin-bottom: 16px;">
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr auto 1fr auto; gap: 8px; align-items: center; margin-bottom: 16px;">
             <select id="empReportSelect" class="input" style="padding: 10px;">
               <option value="">Select Employee...</option>
             </select>
@@ -211,11 +211,12 @@
               <input type="date" id="empReportStart" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
               <div id="empReportStartDisplay" onclick="document.getElementById('empReportStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
             </div>
+            <div style="text-align: center; font-weight: 500; color: #6b7280;">-</div>
             <div style="position: relative;">
               <input type="date" id="empReportEnd" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
               <div id="empReportEndDisplay" onclick="document.getElementById('empReportEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
             </div>
-            <button class="btn btn-primary" onclick="loadEmployeeReport()">Generate Report</button>
+            <button class="btn btn-primary" onclick="loadEmployeeReport()">Generate</button>
           </div>
           
           <div id="empReportContent" style="display: none;">
@@ -298,11 +299,12 @@
           <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2 class="card-title">Attendance Summary</h2>
           </div>
-          <div class="grid-controls-3">
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr 80px; gap: 8px; align-items: center; margin-bottom: 16px;">
             <div style="position: relative;">
               <input type="date" id="attSumStart" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
               <div id="attSumStartDisplay" onclick="document.getElementById('attSumStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
             </div>
+            <div style="text-align: center; font-weight: 500; color: #6b7280;">-</div>
             <div style="position: relative;">
               <input type="date" id="attSumEnd" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
               <div id="attSumEndDisplay" onclick="document.getElementById('attSumEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
@@ -323,11 +325,12 @@
           <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2 class="card-title">Break Time Summary</h2>
           </div>
-          <div class="grid-controls-3">
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr 80px; gap: 8px; align-items: center; margin-bottom: 16px;">
             <div style="position: relative;">
               <input type="date" id="breakSumStart" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
               <div id="breakSumStartDisplay" onclick="document.getElementById('breakSumStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
             </div>
+            <div style="text-align: center; font-weight: 500; color: #6b7280;">-</div>
             <div style="position: relative;">
               <input type="date" id="breakSumEnd" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
               <div id="breakSumEndDisplay" onclick="document.getElementById('breakSumEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
@@ -348,11 +351,12 @@
           <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2 class="card-title">Errors & Missing Logs</h2>
           </div>
-          <div class="grid-controls-3">
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr 80px; gap: 8px; align-items: center; margin-bottom: 16px;">
             <div style="position: relative;">
               <input type="date" id="errStart" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
               <div id="errStartDisplay" onclick="document.getElementById('errStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
             </div>
+            <div style="text-align: center; font-weight: 500; color: #6b7280;">-</div>
             <div style="position: relative;">
               <input type="date" id="errEnd" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
               <div id="errEndDisplay" onclick="document.getElementById('errEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
@@ -379,16 +383,17 @@
           <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
             <h2 class="card-title">Payroll Attendance Summary</h2>
           </div>
-          <div class="grid-controls-4-rate">
+          <div style="display: grid; grid-template-columns: 1fr auto 1fr 120px 80px; gap: 8px; align-items: center; margin-bottom: 16px;">
             <div style="position: relative;">
               <input type="date" id="paySumStart" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
               <div id="paySumStartDisplay" onclick="document.getElementById('paySumStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
             </div>
+            <div style="text-align: center; font-weight: 500; color: #6b7280;">-</div>
             <div style="position: relative;">
               <input type="date" id="paySumEnd" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
               <div id="paySumEndDisplay" onclick="document.getElementById('paySumEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;"></div>
             </div>
-            <input type="number" id="payRate" class="input" placeholder="Rate per Hour" value="70" min="0" step="0.01">
+            <input type="number" id="payRate" class="input" placeholder="Rate/Hr" value="70" min="0" step="0.01" style="padding: 10px;">
             <button class="btn btn-primary" onclick="loadPayrollSummary()">Load</button>
           </div>
           <div id="paySumTable" style="margin-top: 12px; overflow-x: auto;"></div>
@@ -503,6 +508,62 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-primary" onclick="closePayrollBreakdownModal()">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Admin Profile Modal -->
+    <div id="adminProfileModal" class="modal" style="display: none;">
+      <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-header">
+          <h2 class="modal-title">👤 My Profile</h2>
+          <button class="modal-close" onclick="closeAdminProfileModal()">✕</button>
+        </div>
+        <div class="modal-body">
+          <div style="text-align: center; margin-bottom: 25px;">
+            <div style="width: 70px; height: 70px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: inline-flex; align-items: center; justify-content: center; font-size: 2em; color: white; font-weight: bold; margin-bottom: 12px;" id="adminProfileAvatar">A</div>
+            <div style="font-size: 1.1em; font-weight: 600; color: #1f2937;" id="adminProfileNameDisplay">Admin</div>
+            <div style="font-size: 0.85em; color: #6b7280; margin-top: 5px;" id="adminProfileUsernameDisplay">@admin</div>
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937; font-size: 0.9em;">Full Name</label>
+            <input type="text" id="adminProfileName" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937; font-size: 0.9em;">Username</label>
+            <input type="text" id="adminProfileUsername" disabled style="width: 100%; padding: 10px; background: #f3f4f6; border: 2px solid #e5e7eb; border-radius: 8px; color: #6b7280; font-size: 1em;">
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937; font-size: 0.9em;">Member Since</label>
+            <input type="text" id="adminProfileCreated" disabled style="width: 100%; padding: 10px; background: #f3f4f6; border: 2px solid #e5e7eb; border-radius: 8px; color: #6b7280; font-size: 1em;">
+          </div>
+          
+          <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+          
+          <h3 style="font-size: 1em; font-weight: 600; color: #1f2937; margin-bottom: 12px;">🔒 Change Password</h3>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937; font-size: 0.9em;">Current Password</label>
+            <input type="password" id="adminCurrentPassword" placeholder="Enter current password" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937; font-size: 0.9em;">New Password</label>
+            <input type="password" id="adminNewPassword" placeholder="Enter new password" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+            <div style="font-size: 0.8em; color: #6b7280; margin-top: 4px;">Leave blank to keep current password</div>
+          </div>
+          
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: 600; color: #1f2937; font-size: 0.9em;">Confirm New Password</label>
+            <input type="password" id="adminConfirmPassword" placeholder="Confirm new password" style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1em;">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closeAdminProfileModal()">Cancel</button>
+          <button class="btn btn-primary" onclick="saveAdminProfile()">Save Changes</button>
         </div>
       </div>
     </div>
@@ -847,19 +908,28 @@
       const today = new Date().toISOString().split('T')[0];
       const todayFormatted = formatLongDate(today);
       document.getElementById('adminWhControls').innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr 80px; gap: 8px;">
+        <div style="display: grid; grid-template-columns: 1fr auto 1fr 80px; gap: 8px; align-items: center;">
           <div style="position: relative;">
-            <input type="date" id="adminWhDailyDate" value="${today}" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
-            <div onclick="document.getElementById('adminWhDailyDate').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;">
+            <input type="date" id="adminWhDailyStart" value="${today}" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+            <div onclick="document.getElementById('adminWhDailyStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;">
+              ${todayFormatted}
+            </div>
+          </div>
+          <div style="text-align: center; font-weight: 500; color: #6b7280;">-</div>
+          <div style="position: relative;">
+            <input type="date" id="adminWhDailyEnd" value="${today}" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+            <div onclick="document.getElementById('adminWhDailyEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;">
               ${todayFormatted}
             </div>
           </div>
           <button id="adminWhDailyLoad" class="btn btn-primary">Load</button>
         </div>
       `;
-      document.getElementById('adminWhDailyDate').addEventListener('change', function() {
-        const selected = this.value;
-        this.nextElementSibling.textContent = formatLongDate(selected);
+      document.getElementById('adminWhDailyStart').addEventListener('change', function() {
+        this.nextElementSibling.textContent = formatLongDate(this.value);
+      });
+      document.getElementById('adminWhDailyEnd').addEventListener('change', function() {
+        this.nextElementSibling.textContent = formatLongDate(this.value);
       });
       document.getElementById('adminWhDailyLoad').onclick = loadAdminWorkHoursDaily;
     }
@@ -903,32 +973,36 @@
 
     function renderAdminWHMonthlyControls() {
       const d = new Date();
-      const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
       const year = d.getFullYear();
       const month = d.getMonth() + 1;
       const startDate = `${year}-${String(month).padStart(2,'0')}-01`;
       const lastDay = new Date(year, month, 0);
       const endDate = lastDay.toISOString().split('T')[0];
-      const monthRangeFormatted = formatDateRange(startDate, endDate);
+      const startFormatted = formatLongDate(startDate);
+      const endFormatted = formatLongDate(endDate);
       document.getElementById('adminWhControls').innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr 80px; gap: 8px;">
+        <div style="display: grid; grid-template-columns: 1fr auto 1fr 80px; gap: 8px; align-items: center;">
           <div style="position: relative;">
-            <input type="month" id="adminWhMonth" value="${ym}" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
-            <div onclick="document.getElementById('adminWhMonth').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;">
-              ${monthRangeFormatted}
+            <input type="date" id="adminWhMonthStart" value="${startDate}" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+            <div onclick="document.getElementById('adminWhMonthStart').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;">
+              ${startFormatted}
+            </div>
+          </div>
+          <div style="text-align: center; font-weight: 500; color: #6b7280;">-</div>
+          <div style="position: relative;">
+            <input type="date" id="adminWhMonthEnd" value="${endDate}" class="input" style="opacity: 0; position: absolute; pointer-events: none;">
+            <div onclick="document.getElementById('adminWhMonthEnd').showPicker()" style="padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; cursor: pointer; background: white; font-size: 0.95em; color: #374151;">
+              ${endFormatted}
             </div>
           </div>
           <button id="adminWhMonthlyLoad" class="btn btn-primary">Load</button>
         </div>
       `;
-      document.getElementById('adminWhMonth').addEventListener('change', function() {
-        const [y, m] = this.value.split('-');
-        const yr = parseInt(y);
-        const mo = parseInt(m);
-        const start = `${yr}-${String(mo).padStart(2,'0')}-01`;
-        const last = new Date(yr, mo, 0);
-        const end = last.toISOString().split('T')[0];
-        this.nextElementSibling.textContent = formatDateRange(start, end);
+      document.getElementById('adminWhMonthStart').addEventListener('change', function() {
+        this.nextElementSibling.textContent = formatLongDate(this.value);
+      });
+      document.getElementById('adminWhMonthEnd').addEventListener('change', function() {
+        this.nextElementSibling.textContent = formatLongDate(this.value);
       });
       document.getElementById('adminWhMonthlyLoad').onclick = loadAdminWorkHoursMonthly;
     }
@@ -987,8 +1061,9 @@
 
     async function loadAdminWorkHoursDaily() {
       setAdminWhActive('adminWhDailyBtn');
-      const d = document.getElementById('adminWhDailyDate').value;
-      await loadAdminWorkHoursSummary(d, d, 'daily');
+      const s = document.getElementById('adminWhDailyStart').value;
+      const e = document.getElementById('adminWhDailyEnd').value;
+      await loadAdminWorkHoursSummary(s, e, 'daily');
     }
 
     async function loadAdminWorkHoursWeekly() {
@@ -1000,13 +1075,9 @@
 
     async function loadAdminWorkHoursMonthly() {
       setAdminWhActive('adminWhMonthlyBtn');
-      const ym = document.getElementById('adminWhMonth').value.split('-');
-      const year = parseInt(ym[0]);
-      const month = parseInt(ym[1]);
-      const startDate = `${year}-${String(month).padStart(2,'0')}-01`;
-      const last = new Date(year, month, 0);
-      const endDate = last.toISOString().split('T')[0];
-      await loadAdminWorkHoursSummary(startDate, endDate, 'monthly');
+      const s = document.getElementById('adminWhMonthStart').value;
+      const e = document.getElementById('adminWhMonthEnd').value;
+      await loadAdminWorkHoursSummary(s, e, 'monthly');
     }
 
     function initAdminWorkHoursUI() {
@@ -1576,21 +1647,117 @@
 
     function toggleUserMenu() {
       const dropdown = document.getElementById('userDropdown');
-      const button = document.querySelector('.sidebar-user-button');
+      const button = document.querySelector('.navbar-user-button');
       dropdown.classList.toggle('show');
       button.classList.toggle('open');
     }
 
     function viewProfile(event) {
       event.preventDefault();
-      showNotification('Profile page coming soon!', 'info');
       toggleUserMenu();
+      openAdminProfileModal();
+    }
+
+    function openAdminProfileModal() {
+      const admin = JSON.parse(sessionStorage.getItem('admin') || '{}');
+      
+      // Set avatar
+      const avatar = admin.name ? admin.name.charAt(0).toUpperCase() : 'A';
+      document.getElementById('adminProfileAvatar').textContent = avatar;
+      document.getElementById('adminProfileNameDisplay').textContent = admin.name || 'Admin';
+      document.getElementById('adminProfileUsernameDisplay').textContent = '@' + (admin.username || 'admin');
+      
+      // Fill form fields
+      document.getElementById('adminProfileName').value = admin.name || '';
+      document.getElementById('adminProfileUsername').value = admin.username || '';
+      
+      // Format created date
+      if (admin.created_at) {
+        const date = new Date(admin.created_at);
+        document.getElementById('adminProfileCreated').value = date.toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+      } else {
+        document.getElementById('adminProfileCreated').value = 'N/A';
+      }
+      
+      // Clear password fields
+      document.getElementById('adminCurrentPassword').value = '';
+      document.getElementById('adminNewPassword').value = '';
+      document.getElementById('adminConfirmPassword').value = '';
+      
+      document.getElementById('adminProfileModal').style.display = 'flex';
+    }
+
+    function closeAdminProfileModal() {
+      document.getElementById('adminProfileModal').style.display = 'none';
+    }
+
+    async function saveAdminProfile() {
+      const admin = JSON.parse(sessionStorage.getItem('admin') || '{}');
+      const newName = document.getElementById('adminProfileName').value.trim();
+      const currentPassword = document.getElementById('adminCurrentPassword').value;
+      const newPassword = document.getElementById('adminNewPassword').value;
+      const confirmPassword = document.getElementById('adminConfirmPassword').value;
+      
+      if (!newName) {
+        showNotification('Name cannot be empty', 'error');
+        return;
+      }
+      
+      // Check if password change is requested
+      if (newPassword || confirmPassword) {
+        if (!currentPassword) {
+          showNotification('Current password is required to change password', 'error');
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          showNotification('New passwords do not match', 'error');
+          return;
+        }
+        if (newPassword.length < 6) {
+          showNotification('New password must be at least 6 characters', 'error');
+          return;
+        }
+      }
+      
+      try {
+        const response = await fetch(`${API_URL}/admins/${admin.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: newName,
+            current_password: currentPassword || undefined,
+            new_password: newPassword || undefined
+          })
+        });
+        
+        if (response.ok) {
+          // Update session storage
+          admin.name = newName;
+          sessionStorage.setItem('admin', JSON.stringify(admin));
+          
+          // Update navbar display
+          document.getElementById('navUserName').textContent = newName;
+          document.getElementById('navUserAvatar').textContent = newName.charAt(0).toUpperCase();
+          document.getElementById('dropdownName').textContent = newName;
+          
+          closeAdminProfileModal();
+          showNotification('Profile updated successfully', 'success');
+        } else {
+          const data = await response.json();
+          showNotification(data.error || 'Failed to update profile', 'error');
+        }
+      } catch (error) {
+        console.error('Error updating profile:', error);
+        showNotification('Error updating profile', 'error');
+      }
     }
 
     function viewSettings(event) {
       event.preventDefault();
-      showNotification('Settings page coming soon!', 'info');
       toggleUserMenu();
+      showSection('settings');
     }
 
     function logout(event) {
